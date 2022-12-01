@@ -1,4 +1,5 @@
-﻿@model IEnumerable<SacramentMeetingPlanner.Models.SacramentMeeting>
+﻿@model SacramentMeetingPlanner.Models.CalendarModel
+@using System.Web;
 
 @{
     ViewData["Title"] = "Index";
@@ -13,23 +14,48 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.SacramentDate)
             </th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.SacramentDate)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @* @foreach (var item in Model.Meetings) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SacramentDate)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr> 
+        }*@
+        <table class="calendar"> 
+            <tr class="calendarHeader">
+                <td>Sunday</td>
+                <td>Monday</td>
+                <td>Tuesday</td>
+                <td>Wednesday</td>
+                <td>Thursday</td>
+                <td>Friday</td>
+                <td>Saturday</td>
+            </tr>
+            <tr class="calendarBody">
+            @foreach(DateTime Day in Calendar.EachDay(Model.Calendar.calBegin, Model.Calendar.calEnd))
+            {
+                @if ((int)Day.DayOfWeek % 7 == 0)
+                {
+                    @:</tr><tr class="calendarBody">
+                }
+               <td>
+                    @Day.Day.ToString()
+                    @foreach (SacramentMeeting meeting in Model.Meetings.Where(meeting => meeting.SacramentDate.Date == Day.Date))
+                    {
+
+                    }
+               </td>
+            }
+            </tr>
+        </table>
     </tbody>
 </table>

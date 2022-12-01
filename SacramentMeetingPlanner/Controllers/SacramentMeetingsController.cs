@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Data;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -20,10 +22,30 @@ namespace SacramentMeetingPlanner.Controllers
         }
 
         // GET: SacramentMeetings
+        
+        // start and end of the whole cal display
         public async Task<IActionResult> Index()
         {
-              return View(await _context.SacramentMeeting.ToListAsync());
+            CalendarModel model = new CalendarModel {
+                Meetings = await _context.SacramentMeeting.ToListAsync(),
+                Calendar = buildCal(),
+            };
+            return View(model);
         }
+
+        public Calendar buildCal()
+        {
+            DateTime calBegin, calEnd;
+
+            DateTime today = DateTime.Now;
+            calBegin = new DateTime(today.Year, today.Month, 1);
+            calBegin = calBegin.AddDays( -(int)calBegin.DayOfWeek);
+
+            calEnd = new DateTime(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month));
+            
+            return new Calendar(calBegin, calEnd);
+        }
+
 
         // GET: SacramentMeetings/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -48,7 +70,7 @@ namespace SacramentMeetingPlanner.Controllers
         {
             return View();
         }
-
+        
         // POST: SacramentMeetings/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.

@@ -3,12 +3,12 @@ using SacramentMeetingPlanner.Data;
 using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<SacramentMeetingPlannerContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SacramentMeetingPlannerContext") ?? throw new InvalidOperationException("Connection string 'SacramentMeetingPlannerContext' not found.")));
+// builder.Services.AddDbContext<SacramentMeetingPlannerContext>(options =>
+//     options.UseSqlServer(builder.Configuration.GetConnectionString("SacramentMeetingPlannerContext") ?? throw new InvalidOperationException("Connection string 'SacramentMeetingPlannerContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddDbContext<SacramentDbContext>(options =>
+builder.Services.AddDbContext<SacramentMeetingPlannerContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("SacramentMeetingPlannerContext") ?? throw new InvalidOperationException("Connection string 'MegaDeskthign' not found.")));
 var app = builder.Build();
 
