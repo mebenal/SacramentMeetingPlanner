@@ -18,6 +18,24 @@ body {
 }
 
 .calendar {
-  width: 100%;
+  width: 90%;
+  display: table;
   table-layout: fixed;
+}
+
+td  {
+  vertical-align: top;
+  text-align: left;
+  border: 1px solid;
+  height: 100px;
+}
+
+.meetingLink {
+  overflow-wrap: break-word; 
+  background-color: lightgrey;
+}
+
+.eventInsert > input{
+  float: left;
+  overflow: visible;
 }

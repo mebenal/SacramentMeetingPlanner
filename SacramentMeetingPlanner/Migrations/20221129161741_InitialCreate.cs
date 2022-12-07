@@ -26,8 +26,10 @@ namespace SacramentMeetingPlanner.Migrations
                 name: "Event",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    Id = table.Column<string>(type: "INTEGER", nullable: false),
                     EventType = table.Column<string>(type: "TEXT", nullable: false),
+                    EventDetails = table.Column<string>(type: "TEXT", nullable: false),
+                    LocalId = table.Column<string>(type: "TEXT", nullable: false),
                     SacramentMeetingId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>

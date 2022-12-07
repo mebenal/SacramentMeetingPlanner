@@ -11,35 +11,19 @@
     <a asp-action="Create">Create New</a>
 </p>
 <table class="table">
-    <thead>
-        <tr>
-            <th>
-            </th>
+    <thead class="calendar">
+        <tr class="calendarHeader">
+            <th>Sunday</th>
+            <th>Monday</thd>
+            <th>Tuesday</th>
+            <th>Wednesday</th>
+            <th>Thursday</th>
+            <th>Friday</th>
+            <th>Saturday</th>
         </tr>
     </thead>
     <tbody>
-        @* @foreach (var item in Model.Meetings) {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.SacramentDate)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-            </tr> 
-        }*@
         <table class="calendar"> 
-            <tr class="calendarHeader">
-                <td>Sunday</td>
-                <td>Monday</td>
-                <td>Tuesday</td>
-                <td>Wednesday</td>
-                <td>Thursday</td>
-                <td>Friday</td>
-                <td>Saturday</td>
-            </tr>
             <tr class="calendarBody">
             @foreach(DateTime Day in Calendar.EachDay(Model.Calendar.calBegin, Model.Calendar.calEnd))
             {
@@ -51,7 +35,11 @@
                     @Day.Day.ToString()
                     @foreach (SacramentMeeting meeting in Model.Meetings.Where(meeting => meeting.SacramentDate.Date == Day.Date))
                     {
-
+                        <a asp-action="Details" asp-route-id="@meeting.Id">
+                            <div class="" style="overflow-wrap: break-word; background-color: light-grey"> 
+                                @meeting.SacramentDate
+                            </div>
+                        </a>
                     }
                </td>
             }

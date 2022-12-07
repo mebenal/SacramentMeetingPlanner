@@ -4,27 +4,83 @@
     ViewData["Title"] = "Edit";
 }
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <h1>Edit</h1>
 
 <h4>SacramentMeeting</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
+        <form asp-action="Edit" method="post">
+             <div class="form-group">
                 <label asp-for="SacramentDate" class="control-label"></label>
                 <input asp-for="SacramentDate" class="form-control" />
                 <span asp-validation-for="SacramentDate" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <label asp-for="Presiding" class="control-label"></label>
+                <input asp-for="Presiding" class="form-control" />
+                <span asp-validation-for="Presiding" class="text-danger"></span>
             </div>
+            <div class="form-group" id="event-list">
+                @foreach(var value in Model.EventList)
+                {
+                    <div id=@value.Id class="form-group event">
+                        <input id="type" name="EventList[@(value.localId)].EventType" value=@value.EventType />
+                        <input id="value@(value.localId)" name=EventList[@(value.localId)].EventDetails value=@value.EventDetails />
+                        <input type="hidden" name="EventList[@value.localId].localId" value="0"/>
+                        <input type="hidden" name="EventList[@value.localId].Id" value="@value.Id"/>
+                        <a href="#" id="remove">Remove</a>
+                    </div>
+                }
+            </div>
+            <a href="#" id="add">Add</a><br>
+            <input type="submit" value="Edit" class="btn btn-default" />
         </form>
     </div>
 </div>
+<script type="text/javascript">
+    $(function () {
+        $("#add").click(function (event) {
+            event.preventDefault();
+            var i = $("#event-list").children().length;
+            var eventSelect = `
+                <div id=${i} class="form-group event">
+                    <input id="type" name="EventList[${i}].EventType"/>
+                    <input id="value${i}" name="EventList[${i}].keyValuePairs.Value"/>
+                    <input type="hidden" name="EventList[${i}].id" value="0"/>
+                    <a href="#" id="remove">Remove</a>
+                </div>`;
+            $("#event-list").append(eventSelect);
+        });
 
+        $("#event-list").on("click", "#remove", function() {
+            var removalId = this.parentNode.id;
+            var children = $("#event-list").children()
+
+            children.each( function() {
+                console.log("I am printing here")
+                if (this.id > removalId)
+                {
+                    this.id = this.id - 1
+                    this.children[0].name = `EventList[${this.id}].EventType`
+                    this.children[1].name = `EventList[${this.id}].EventType[]`
+                    this.children[1].id = `value${this.id}`
+                    
+                }
+            })
+            children[removalId].remove()
+        });
+
+        $("#event-list").on("input", "#type", function() {
+            var inputValue = this.value
+            var currentId = this.parentNode.id
+
+            $("#event-list").find(`#key${currentId}`).attr("value", `EventList[${currentId}].EventType[${inputValue}]`)
+            
+        })
+    })
+</script>
 <div>
     <a asp-action="Index">Back to List</a>
 </div>

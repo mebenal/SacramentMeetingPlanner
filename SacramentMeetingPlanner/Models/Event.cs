@@ -4,10 +4,11 @@ namespace SacramentMeetingPlanner.Models
 {
     public class Event
     {
-        public string Id { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int? Id { get; set; }
+        public SacramentMeeting? Meeting { get; set; }
+        public string localId { get; set;} 
         public string EventType { get; set; }
-        
-        [NotMapped]
-        public Dictionary<string, object> keyValuePairs { get; set; }
+        public string EventDetails { get; set; }
     }
 }

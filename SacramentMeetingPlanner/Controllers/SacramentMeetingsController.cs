@@ -68,7 +68,8 @@ namespace SacramentMeetingPlanner.Controllers
         // GET: SacramentMeetings/Create
         public IActionResult Create()
         {
-            return View();
+            var meeting = new SacramentMeeting();
+            return View(meeting);
         }
         
         // POST: SacramentMeetings/Create
@@ -76,8 +77,13 @@ namespace SacramentMeetingPlanner.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,SacramentDate")] SacramentMeeting sacramentMeeting)
+        public async Task<IActionResult> Create(SacramentMeeting sacramentMeeting)
         {
+
+            foreach (var item in sacramentMeeting.EventList)
+            {
+                item.Meeting = sacramentMeeting;
+            }
             if (ModelState.IsValid)
             {
                 _context.Add(sacramentMeeting);
@@ -94,12 +100,15 @@ namespace SacramentMeetingPlanner.Controllers
             {
                 return NotFound();
             }
-
-            var sacramentMeeting = await _context.SacramentMeeting.FindAsync(id);
+    
+            var sacramentMeeting = await _context.SacramentMeeting
+                                            .Include(i => i.EventList)
+                                            .FirstAsync(i => i.Id == id);
             if (sacramentMeeting == null)
             {
                 return NotFound();
             }
+
             return View(sacramentMeeting);
         }
 
@@ -108,33 +117,51 @@ namespace SacramentMeetingPlanner.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,SacramentDate")] SacramentMeeting sacramentMeeting)
+        public async Task<IActionResult> Edit(int id, SacramentMeeting sacramentMeeting)
         {
-            if (id != sacramentMeeting.Id)
-            {
-                return NotFound();
-            }
 
-            if (ModelState.IsValid)
+            var currentMeeting = await _context.SacramentMeeting
+                .Where(p => p.Id == sacramentMeeting.Id)
+                .Include(p => p.EventList)
+                .FirstAsync(i => i.Id == id);
+
+            if (currentMeeting != null)
             {
-                try
+                _context.Entry(currentMeeting).CurrentValues.SetValues(sacramentMeeting);
+
+                foreach (var existingChild in currentMeeting.EventList.ToList())
                 {
-                    _context.Update(sacramentMeeting);
-                    await _context.SaveChangesAsync();
+                    if (!sacramentMeeting.EventList.Any(c => c.Id == existingChild.Id))
+                        _context.Event.Remove(existingChild);
                 }
-                catch (DbUpdateConcurrencyException)
+
+                foreach (var childModel in sacramentMeeting.EventList)
                 {
-                    if (!SacramentMeetingExists(sacramentMeeting.Id))
-                    {
-                        return NotFound();
-                    }
+                    var existingChild = currentMeeting.EventList
+                        .Where(c => c.Id == childModel.Id && c.Id != default(int))
+                        .SingleOrDefault();
+
+                    if (existingChild != null)
+                        // Update child
+                        _context.Entry(existingChild).CurrentValues.SetValues(childModel);
                     else
                     {
-                        throw;
+                        // Insert child
+                        var newChild = new Event
+                        {
+                            Id = childModel.Id,
+                            localId = childModel.localId,
+                            EventType  = childModel.EventType,
+                            EventDetails  = childModel.EventDetails,
+                            Meeting = childModel.Meeting,
+                        };
+
+                        currentMeeting.EventList.Add(newChild);
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                _context.SaveChanges();
             }
+
             return View(sacramentMeeting);
         }
 
