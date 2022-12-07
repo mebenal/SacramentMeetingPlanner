@@ -1,23 +1,41 @@
 html {
-  font-size: 14px;
+   font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+   html {
+      font-size: 16px;
+   }
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+   position: relative;
+   min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+   margin-bottom: 60px;
 }
 
 .calendar {
-  width: 100%;
-  table-layout: fixed;
+   width: 90%;
+   display: table;
+   table-layout: fixed;
+}
+
+td {
+   vertical-align: top;
+   text-align: left;
+   border: 1px solid;
+   height: 100px;
+}
+
+.meetingLink {
+   overflow-wrap: break-word;
+   background-color: lightgrey;
+}
+
+.eventInsert > input {
+   float: left;
+   overflow: visible;
 }
