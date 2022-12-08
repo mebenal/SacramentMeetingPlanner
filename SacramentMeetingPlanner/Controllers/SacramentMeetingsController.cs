@@ -26,14 +26,15 @@ namespace SacramentMeetingPlanner.Controllers
         // start and end of the whole cal display
         public async Task<IActionResult> Index()
         {
-            CalendarModel model = new CalendarModel {
-                Meetings = await _context.SacramentMeeting.ToListAsync(),
-                Calendar = buildCal(),
+            CalendarModel model = new()
+            {
+                Meetings = await _context.SacramentMeetings.ToListAsync(),
+                Calendar = BuildCal(),
             };
             return View(model);
         }
 
-        public Calendar buildCal()
+        public Calendar BuildCal()
         {
             DateTime calBegin, calEnd;
 
@@ -50,13 +51,17 @@ namespace SacramentMeetingPlanner.Controllers
         // GET: SacramentMeetings/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.SacramentMeeting == null)
+            if (id == null || _context.SacramentMeetings == null)
             {
                 return NotFound();
             }
 
-            var sacramentMeeting = await _context.SacramentMeeting
-                .FirstOrDefaultAsync(m => m.Id == id);
+            SacramentMeeting sacramentMeeting = await _context.SacramentMeetings
+                .Include(c => c.EventList)
+                    .ThenInclude(c => c.EventType)
+                .FirstOrDefaultAsync(m => m.SacramentMeetingId == id);
+
+
             if (sacramentMeeting == null)
             {
                 return NotFound();
@@ -82,7 +87,7 @@ namespace SacramentMeetingPlanner.Controllers
 
             foreach (var item in sacramentMeeting.EventList)
             {
-                item.Meeting = sacramentMeeting;
+                item.SacramentMeeting = sacramentMeeting;
             }
             if (ModelState.IsValid)
             {
@@ -96,14 +101,14 @@ namespace SacramentMeetingPlanner.Controllers
         // GET: SacramentMeetings/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.SacramentMeeting == null)
+            if (id == null || _context.SacramentMeetings == null)
             {
                 return NotFound();
             }
     
-            var sacramentMeeting = await _context.SacramentMeeting
+            var sacramentMeeting = await _context.SacramentMeetings
                                             .Include(i => i.EventList)
-                                            .FirstAsync(i => i.Id == id);
+                                            .FirstAsync(i => i.SacramentMeetingId == id);
             if (sacramentMeeting == null)
             {
                 return NotFound();
@@ -120,10 +125,10 @@ namespace SacramentMeetingPlanner.Controllers
         public async Task<IActionResult> Edit(int id, SacramentMeeting sacramentMeeting)
         {
 
-            var currentMeeting = await _context.SacramentMeeting
-                .Where(p => p.Id == sacramentMeeting.Id)
+            var currentMeeting = await _context.SacramentMeetings
+                .Where(p => p.SacramentMeetingId == sacramentMeeting.SacramentMeetingId)
                 .Include(p => p.EventList)
-                .FirstAsync(i => i.Id == id);
+                .FirstAsync(i => i.SacramentMeetingId == id);
 
             if (currentMeeting != null)
             {
@@ -131,14 +136,14 @@ namespace SacramentMeetingPlanner.Controllers
 
                 foreach (var existingChild in currentMeeting.EventList.ToList())
                 {
-                    if (!sacramentMeeting.EventList.Any(c => c.Id == existingChild.Id))
-                        _context.Event.Remove(existingChild);
+                    if (!sacramentMeeting.EventList.Any(c => c.EventId == existingChild.EventId))
+                        _context.Events.Remove(existingChild);
                 }
 
                 foreach (var childModel in sacramentMeeting.EventList)
                 {
                     var existingChild = currentMeeting.EventList
-                        .Where(c => c.Id == childModel.Id && c.Id != default(int))
+                        .Where(c => c.EventId == childModel.EventId && c.EventId != default(int))
                         .SingleOrDefault();
 
                     if (existingChild != null)
@@ -149,11 +154,10 @@ namespace SacramentMeetingPlanner.Controllers
                         // Insert child
                         var newChild = new Event
                         {
-                            Id = childModel.Id,
-                            localId = childModel.localId,
-                            EventType  = childModel.EventType,
-                            EventDetails  = childModel.EventDetails,
-                            Meeting = childModel.Meeting,
+                            EventId = childModel.EventId,
+                            EventTypeId  = childModel.EventTypeId,
+                            RowId  = childModel.RowId,
+                            SacramentMeeting = childModel.SacramentMeeting,
                         };
 
                         currentMeeting.EventList.Add(newChild);
@@ -168,13 +172,13 @@ namespace SacramentMeetingPlanner.Controllers
         // GET: SacramentMeetings/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.SacramentMeeting == null)
+            if (id == null || _context.SacramentMeetings == null)
             {
                 return NotFound();
             }
 
-            var sacramentMeeting = await _context.SacramentMeeting
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var sacramentMeeting = await _context.SacramentMeetings
+                .FirstOrDefaultAsync(m => m.SacramentMeetingId == id);
             if (sacramentMeeting == null)
             {
                 return NotFound();
@@ -188,14 +192,14 @@ namespace SacramentMeetingPlanner.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.SacramentMeeting == null)
+            if (_context.SacramentMeetings == null)
             {
                 return Problem("Entity set 'SacramentMeetingPlannerContext.SacramentMeeting'  is null.");
             }
-            var sacramentMeeting = await _context.SacramentMeeting.FindAsync(id);
+            var sacramentMeeting = await _context.SacramentMeetings.FindAsync(id);
             if (sacramentMeeting != null)
             {
-                _context.SacramentMeeting.Remove(sacramentMeeting);
+                _context.SacramentMeetings.Remove(sacramentMeeting);
             }
             
             await _context.SaveChangesAsync();
@@ -204,7 +208,7 @@ namespace SacramentMeetingPlanner.Controllers
 
         private bool SacramentMeetingExists(int id)
         {
-          return _context.SacramentMeeting.Any(e => e.Id == id);
+          return _context.SacramentMeetings.Any(e => e.SacramentMeetingId == id);
         }
     }
 }

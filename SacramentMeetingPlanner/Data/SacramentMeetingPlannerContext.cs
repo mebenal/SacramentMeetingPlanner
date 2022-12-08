@@ -13,14 +13,21 @@ namespace SacramentMeetingPlanner.Data
             : base(options)
         {
         }
-        public DbSet<SacramentMeeting> SacramentMeeting { get; set; } = default!;
-        public DbSet<Event> Event {get;set;} = default!;
+
+        public DbSet<SacramentMeeting> SacramentMeetings { get; set; } = default!;
+        public DbSet<Event> Events {get; set;} = default!;
+        public DbSet<EventType> EventTypes { get; set; } = default!;
+        public DbSet<Hymn> Hymns { get; set; } = default!;
+        public DbSet<Person> Person { get; set; } = default!;
+
 
         protected internal virtual void OnModelCreating(ModelBuilder modelBuilder) 
         {
-            modelBuilder.Entity<SacramentMeeting>()
-                .HasMany(c => c.EventList)
-                .WithOne(e => e.Meeting);
+            modelBuilder.Entity<SacramentMeeting>().ToTable("sacrament_meeting");
+            modelBuilder.Entity<Event>().ToTable("event");
+            modelBuilder.Entity<EventType>().ToTable("event_type");
+            modelBuilder.Entity<Hymn>().ToTable("hymn");
+            modelBuilder.Entity<Person>().ToTable("person");
         }
     }
 }

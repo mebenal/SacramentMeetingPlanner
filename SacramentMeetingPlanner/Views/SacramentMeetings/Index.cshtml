@@ -33,11 +33,11 @@
                 }
                <td>
                     @Day.Day.ToString()
-                    @foreach (SacramentMeeting meeting in Model.Meetings.Where(meeting => meeting.SacramentDate.Date == Day.Date))
+                    @foreach (SacramentMeeting meeting in Model.Meetings.Where(meeting => meeting.SacramentMeetingDate.Date == Day.Date))
                     {
-                        <a asp-action="Details" asp-route-id="@meeting.Id">
+                        <a asp-action="Details" asp-route-id="@meeting.SacramentMeetingId">
                             <div class="" style="overflow-wrap: break-word; background-color: light-grey"> 
-                                @meeting.SacramentDate
+                                @meeting.SacramentMeetingDate
                             </div>
                         </a>
                     }

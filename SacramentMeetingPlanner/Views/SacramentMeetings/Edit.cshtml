@@ -13,23 +13,18 @@
     <div class="col-md-4">
         <form asp-action="Edit" method="post">
              <div class="form-group">
-                <label asp-for="SacramentDate" class="control-label"></label>
-                <input asp-for="SacramentDate" class="form-control" />
-                <span asp-validation-for="SacramentDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Presiding" class="control-label"></label>
-                <input asp-for="Presiding" class="form-control" />
-                <span asp-validation-for="Presiding" class="text-danger"></span>
+                <label asp-for="SacramentMeetingDate" class="control-label"></label>
+                <input asp-for="SacramentMeetingDate" class="form-control" />
+                <span asp-validation-for="SacramentMeetingDate" class="text-danger"></span>
             </div>
             <div class="form-group" id="event-list">
                 @foreach(var value in Model.EventList)
                 {
-                    <div id=@value.Id class="form-group event">
-                        <input id="type" name="EventList[@(value.localId)].EventType" value=@value.EventType />
-                        <input id="value@(value.localId)" name=EventList[@(value.localId)].EventDetails value=@value.EventDetails />
-                        <input type="hidden" name="EventList[@value.localId].localId" value="0"/>
-                        <input type="hidden" name="EventList[@value.localId].Id" value="@value.Id"/>
+                    <div id=@value.EventId class="form-group event">
+                        <input id="type" name="EventList[@(value.EventId)].EventType" value=@value.EventTypeId />
+                        <input id="value@(value.EventId)" name=EventList[@(value.EventId)].EventDetails value=@value.RowId />
+                        <input type="hidden" name="EventList[@value.EventId].localId" value="0"/>
+                        <input type="hidden" name="EventList[@value.EventId].Id" value="@value.EventId"/>
                         <a href="#" id="remove">Remove</a>
                     </div>
                 }
