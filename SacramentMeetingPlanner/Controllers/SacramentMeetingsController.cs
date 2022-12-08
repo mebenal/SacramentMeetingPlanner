@@ -77,7 +77,7 @@ namespace SacramentMeetingPlanner.Controllers
             SelectList eventTypes = new(_context.EventTypes.ToList(), "EventTypeId", "EventName");
             CreateView createView = new()
             {
-                Hynns = hymns,
+                Hymns = hymns,
                 EventTypes = eventTypes
             };
             return View(createView);
