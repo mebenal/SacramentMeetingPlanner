@@ -19,12 +19,20 @@
             </div>
             <div class="form-group" id="event-list">
                 @foreach(var value in Model.EventList)
-                { //If statement goes here, check if event is Hymn or not.
-                    <div id=@value.EventId class="form-group event">
-                        <input id="type" name="EventList[@(value.EventId)].EventType" value=@value.EventTypeId />
-                        <input id="value@(value.EventId)" name=EventList[@(value.EventId)].EventDetails value=@value.RowId />
-                        <input type="hidden" name="EventList[@value.EventId].localId" value="0"/>
-                        <input type="hidden" name="EventList[@value.EventId].Id" value="@value.EventId"/>
+                {   
+                    @{var i = 0;}
+                    //If statement goes here, check if event is Hymn or not.
+                        <div id="@i" class="form-group event">
+                        <select id="event-type" name="EventList[@i].EventType">
+                            <option>Speaker</option>
+                            <option>Hymn</option>
+                            <option>Prayer</option>
+                            <option>Person</option>
+                        </select>
+                        <input name="EventList[@i].EventDetails"/>
+                        <input name="EventList[@i].FirstName"/>
+                        <input name="EventList[@i].LastName"/>
+                        <input name="EventList[@i].Topic"/>
                         <a href="#" id="remove">Remove</a>
                     </div>
                 }
