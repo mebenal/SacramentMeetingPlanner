@@ -24,8 +24,7 @@
             <div class="form-group" id="event-list">
             <div id=0 class="form-group event">
                 <input id="type" name="EventList[0].EventType" />
-                <input id="details" name="EventList[0].EventDetails" />
-                <input type="hidden" name="EventList[0].localId" value="0" />
+                <input id="details" name="EventList[0].EventDescription" />
                 <a href="#" id="remove">Remove</a>
             </div>
                 @Html.EditorFor(meeting => meeting.EventList)
@@ -42,9 +41,8 @@
             var i = $("#event-list").children().length;
             var eventSelect = `
                 <div id=${i} class="form-group event">
-                    <input id="type" name="EventList[${i}].EventType"/>
-                    <input id="details" name="EventList[${i}].EventDetails"/>
-                    <input type="hidden" name="EventList[${i}].localId" value="${i}"/>
+                    <input id="EventType" name="EventList[${i}].EventType"/>
+                    <input id="EventDescription" name="EventList[${i}].EventDescription"/>
                     <a href="#" id="remove">Remove</a>
                 </div>`;
             $("#event-list").append(eventSelect);
@@ -60,8 +58,7 @@
                 {
                     this.id = this.id - 1
                     this.children[0].name = `EventList[${this.id}].EventType`
-                    this.children[1].name = `EventList[${this.id}].EventDetails`
-                    this.children[2].name = `EventList[${i}].localId`
+                    this.children[1].name = `EventList[${this.id}].EventDescription`
                     this.children[2].value = `${this.id}`;
                 }
             })

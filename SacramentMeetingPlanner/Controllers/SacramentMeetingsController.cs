@@ -73,8 +73,14 @@ namespace SacramentMeetingPlanner.Controllers
         // GET: SacramentMeetings/Create
         public IActionResult Create()
         {
-            var meeting = new SacramentMeeting();
-            return View(meeting);
+            SelectList hymns = new(_context.Hymns.ToList(), "HymnId", "FullHymn");
+            SelectList eventTypes = new(_context.EventTypes.ToList(), "EventTypeId", "EventName");
+            CreateView createView = new()
+            {
+                Hynns = hymns,
+                EventTypes = eventTypes
+            };
+            return View(createView);
         }
         
         // POST: SacramentMeetings/Create
@@ -82,12 +88,15 @@ namespace SacramentMeetingPlanner.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(SacramentMeeting sacramentMeeting)
+        public async Task<IActionResult> Create(SacramentMeetingView sacramentMeeting)
         {
-
+            List<Event> sacramentMeetingEvents = new();
             foreach (var item in sacramentMeeting.EventList)
             {
-                item.SacramentMeeting = sacramentMeeting;
+                sacramentMeetingEvents.Add(
+                    new()
+                    {
+                    });;
             }
             if (ModelState.IsValid)
             {
