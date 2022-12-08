@@ -11,12 +11,31 @@
     <h4>SacramentMeeting</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.SacramentDate)
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.SacramentDate)
         </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Presiding)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => Model.Presiding)
+        </dd>
+        @{
+            var list = Model.EventList.ToList();
+            list = list.OrderBy(i => i.localId).ToList();
+            foreach (var item in list)
+            {
+                <dt class = "col-sm-2">
+                    @Html.DisplayFor(value => item.EventType)
+                </dt>
+                <dd class = "col-sm-10">
+                    @Html.DisplayFor(value => item.EventDetails)
+                </dd>
+            }
+        }
     </dl>
     
     <form asp-action="Delete">

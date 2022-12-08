@@ -10,6 +10,34 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+@using (Html.BeginForm())
+{
+
+
+<form asp-controller="SacramentMeeting" asp-action="Index" method="get">
+        Month: <select name="month" asp-for="Calendar.Month">
+            <!option value="1" @((Model.Calendar.Month == 1)? "selected" : "")>January</!option>
+            <!option value="2" @((Model.Calendar.Month == 2)? "selected" : "")>Febuary</!option>
+            <!option value="3" @((Model.Calendar.Month == 3)? "selected" : "")>March</!option>
+            <!option value="4" @((Model.Calendar.Month == 4)? "selected" : "")>April</!option>
+            <!option value="5" @((Model.Calendar.Month == 5)? "selected" : "")>May</!option>
+            <!option value="6" @((Model.Calendar.Month == 6)? "selected" : "")>June</!option>
+            <!option value="7" @((Model.Calendar.Month == 7)? "selected" : "")>July</!option>
+            <!option value="8" @((Model.Calendar.Month == 8)? "selected" : "")>August</!option>
+            <!option value="9" @((Model.Calendar.Month == 9)? "selected" : "")>September</!option>
+            <!option value="10" @((Model.Calendar.Month == 10)? "selected" : "")>October</!option>
+            <!option value="11" @((Model.Calendar.Month == 11)? "selected" : "")>November</!option>
+            <!option value="12" @((Model.Calendar.Month == 12)? "selected" : "")>December</!option>
+        </select>
+        Year: <select name="year" asp-for="Calendar.Year">
+            <option value=@(DateTime.Now.Year + 1) selected>@(DateTime.Now.Year + 1)</option>
+            @for(var i = DateTime.Now.Year; i >= 1970; i--){
+                 <option value=@i >@i</option>
+            }
+        </select>
+        <input type="submit" value="Go" />
+</form>
+}
 <table class="table">
     <thead class="calendar">
         <tr class="calendarHeader">
