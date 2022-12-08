@@ -21,18 +21,24 @@
                 <input asp-for="SacramentDate" asp-format="{0:yyyy-MM-dd}" class="form-control" value=@DateTime.Now/>
                 <span asp-validation-for="SacramentDate" class="text-danger"></span>
             </div>
-             <div class="form-group">
+            <div class="form-group">
                 <label asp-for="Presiding" class="control-label"></label>
                 <input asp-for="Presiding" class="form-control" />
                 <span asp-validation-for="Presiding" class="text-danger"></span>
             </div>
             <div class="form-group" id="event-list">
-            <div id=0 class="form-group event">
-                <input id="type" name="EventList[0].EventType" />
-                <input id="details" name="EventList[0].EventDetails" />
-                <input type="hidden" name="EventList[0].localId" value="0" />
-                <a href="#" id="remove">Remove</a>
-            </div>
+                <div id="0" class="form-group event">
+                    <select id="event-type" name="EventList[0].EventType">
+                        <option>Speaker</option>
+                        <option>Hymn</option>
+                        <option>Prayer</option>
+                        <option>Person</option>
+                    </select>
+                    <input name="EventList[0].EventDetails"/>
+                    <input name="EventList[0].FirstName"/>
+                    <input name="EventList[0].LastName"/>
+                    <a href="#" id="remove">Remove</a>
+                </div>
                 @Html.EditorFor(meeting => meeting.EventList)
             </div>
             <a href="#" id="add">Add</a><br>
@@ -47,9 +53,15 @@
             var i = $("#event-list").children().length;
             var eventSelect = `
                 <div id=${i} class="form-group event">
-                    <input id="type" name="EventList[${i}].EventType"/>
-                    <input id="details" name="EventList[${i}].EventDetails"/>
-                    <input type="hidden" name="EventList[${i}].localId" value="${i}"/>
+                    <select id="event-type" name="EventList[${i}].EventType"/>
+                        <option>Speaker</option>
+                        <option>Hymn</option>
+                        <option>Prayer</option>
+                        <option>Person</option>
+                    </select>
+                    <input name="EventList[${i}].EventDetails"/>
+                    <input name="EventList[${i}].FirstName"/>
+                    <input name="EventList[${i}].LastName"/>
                     <a href="#" id="remove">Remove</a>
                 </div>`;
             $("#event-list").append(eventSelect);
@@ -60,18 +72,21 @@
             var children = $("#event-list").children()
 
             children.each( function() {
-                console.log("I am printing here")
                 if (this.id > removalId)
                 {
                     this.id = this.id - 1
                     this.children[0].name = `EventList[${this.id}].EventType`
                     this.children[1].name = `EventList[${this.id}].EventDetails`
-                    this.children[2].name = `EventList[${i}].localId`
-                    this.children[2].value = `${this.id}`;
+                    this.children[2].name = `EventList[${this.id}].FirstName`
+                    this.children[3].name = `EventList[${this.id}].LastName`
                 }
             })
             children[removalId].remove()
         });
+
+        $("#event-list").on("change", "#event-type", function(e){
+            console.log(this.value)
+        })
     });
 </script>
 <div>

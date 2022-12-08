@@ -134,33 +134,12 @@ namespace SacramentMeetingPlanner.Controllers
                     if (!sacramentMeeting.EventList.Any(c => c.Id == existingChild.Id))
                         _context.Event.Remove(existingChild);
                 }
-
-                foreach (var childModel in sacramentMeeting.EventList)
-                {
-                    var existingChild = currentMeeting.EventList
-                        .Where(c => c.Id == childModel.Id && c.Id != default(int))
-                        .SingleOrDefault();
-
-                    if (existingChild != null)
-                        // Update child
-                        _context.Entry(existingChild).CurrentValues.SetValues(childModel);
-                    else
-                    {
-                        // Insert child
-                        var newChild = new Event
-                        {
-                            Id = childModel.Id,
-                            localId = childModel.localId,
-                            EventType  = childModel.EventType,
-                            EventDetails  = childModel.EventDetails,
-                            Meeting = childModel.Meeting,
-                        };
-
-                        currentMeeting.EventList.Add(newChild);
-                    }
-                }
+                
+                _context.SacramentMeeting.Remove(sacramentMeeting);
+                _context.Add(currentMeeting);
                 _context.SaveChanges();
             }
+            return RedirectToAction(nameof(Index));
 
             return View(sacramentMeeting);
         }
