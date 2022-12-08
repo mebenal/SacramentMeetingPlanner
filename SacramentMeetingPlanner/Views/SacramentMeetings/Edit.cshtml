@@ -25,11 +25,17 @@
             <div class="form-group" id="event-list">
                 @foreach(var value in Model.EventList)
                 {
-                    <div id=@value.Id class="form-group event">
-                        <input id="type" name="EventList[@(value.localId)].EventType" value=@value.EventType />
-                        <input id="value@(value.localId)" name=EventList[@(value.localId)].EventDetails value=@value.EventDetails />
-                        <input type="hidden" name="EventList[@value.localId].localId" value="0"/>
-                        <input type="hidden" name="EventList[@value.localId].Id" value="@value.Id"/>
+                    <div id="@value.localId" class="form-group event">
+                        <select id="event-type" name="EventList[@(value.localId)].EventType">
+                            <option>Speaker</option>
+                            <option>Hymn</option>
+                            <option>Prayer</option>
+                            <option>Person</option>
+                        </select>
+                        <input name="EventList[@(value.localId)].EventDetails"/>
+                        <input name="EventList[@(value.localId)].FirstName"/>
+                        <input name="EventList[@(value.localId)].LastName"/>
+                        <input name="EventList[@(value.localId)].Topic"/>
                         <a href="#" id="remove">Remove</a>
                     </div>
                 }
