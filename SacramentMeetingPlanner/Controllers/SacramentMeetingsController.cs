@@ -156,11 +156,12 @@ namespace SacramentMeetingPlanner.Controllers
                             Meeting = childModel.Meeting,
                         };
 
-                        currentMeeting.EventList.Add(newChild);
+                        currentMeeting.EventList.Add(childModel);
                     }
                 }
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
+            return RedirectToAction(nameof(Index));
 
             return View(sacramentMeeting);
         }
