@@ -73,24 +73,7 @@ namespace SacramentMeetingPlanner.Controllers
         // GET: SacramentMeetings/Create
         public IActionResult Create()
         {
-            List<Hymn> hymns = _context.Hymns.ToList();
-            string hymnString = "";
-            foreach (Hymn hymn in hymns)
-            {
-                hymnString += $"<option value=\"{hymn.HymnId}\">{hymn.FullHymn}</option>";
-            }
-            List<EventType> eventTypes = _context.EventTypes.ToList();
-            string eventTypeString = "";
-            foreach (EventType eventType in eventTypes)
-            {
-                eventTypeString += $"<option value=\"{eventType.EventTypeId}\">{eventType.EventTypeName}</option>";
-            }
-            CreateView createView = new()
-            {
-                Hynns = hymnString,
-                EventTypes = eventTypeString
-            };
-            return View(createView);
+            return View(GetSacramentMeetingView(null));
         }
         
         // POST: SacramentMeetings/Create
@@ -101,7 +84,7 @@ namespace SacramentMeetingPlanner.Controllers
         public async Task<IActionResult> Create(SacramentMeetingView sacramentMeeting)
         {
             List<EventType> eventTypes = await _context.EventTypes.ToListAsync();
-            List<Hymn> hymns = await _context.Hymns.ToListAsync();
+            List<Hymn> hymns = await _context.Hymns.AsNoTrackingWithIdentityResolution().ToListAsync();
 
             SacramentMeeting dbMeeting = new()
             {
@@ -111,9 +94,8 @@ namespace SacramentMeetingPlanner.Controllers
             _context.SacramentMeetings.Add(dbMeeting);
             await _context.SaveChangesAsync();
 
-            List<Event> sacramentMeetingEvents = new();
             int? lastEventId = null;
-            foreach (var item in sacramentMeeting.EventList)
+            foreach (EventView item in sacramentMeeting.EventList)
             {
                 Event newEvent = new()
                 {
@@ -131,7 +113,8 @@ namespace SacramentMeetingPlanner.Controllers
                         break;
                     case "Speaker":
                         newEvent.Topic = item.Topic;
-                        Person person1 = _context.Person.Where(p => p.FirstName == item.FirstName && p.LastName == item.LastName).FirstOrDefault();
+                        Person person1 = _context.Person.AsNoTrackingWithIdentityResolution()
+                            .SingleOrDefault(p => p.FirstName == item.FirstName && p.LastName == item.LastName);
                         if (person1 is null)
                         {
                             person1 = new()
@@ -146,7 +129,8 @@ namespace SacramentMeetingPlanner.Controllers
                         break;
                     case "Person":
                     case "Prayer":
-                        Person person2 = _context.Person.Where(p => p.FirstName == item.FirstName && p.LastName == item.LastName).FirstOrDefault();
+                        Person person2 = _context.Person.AsNoTrackingWithIdentityResolution()
+                            .SingleOrDefault(p => p.FirstName == item.FirstName && p.LastName == item.LastName);
                         if (person2 is null)
                         {
                             person2 = new()
@@ -194,6 +178,29 @@ namespace SacramentMeetingPlanner.Controllers
             }
 
             return View(sacramentMeeting);
+        }
+
+        public SacramentMeetingView GetSacramentMeetingView(List<EventView>? eventList)
+        {
+            List<Hymn> hymns = _context.Hymns.ToList();
+            string hymnString = "";
+            foreach (Hymn hymn in hymns)
+            {
+                hymnString += $"<option value=\"{hymn.HymnId}\">{hymn.FullHymn}</option>";
+            }
+            List<EventType> eventTypes = _context.EventTypes.ToList();
+            string eventTypeString = "";
+            foreach (EventType eventType in eventTypes)
+            {
+                eventTypeString += $"<option value=\"{eventType.EventTypeId}\">{eventType.EventTypeName}</option>";
+            }
+            SacramentMeetingView createView = new()
+            {
+                Hymns = hymnString,
+                EventTypes = eventTypeString,
+                EventList = eventList
+            };
+            return createView;
         }
 
         // POST: SacramentMeetings/Edit/5

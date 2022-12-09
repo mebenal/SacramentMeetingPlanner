@@ -1,18 +1,16 @@
-﻿@model SacramentMeetingPlanner.Models.CreateView
+﻿@model SacramentMeetingPlanner.Models.SacramentMeetingView
 
 @{
     ViewData["Title"] = "Create";
-    var data = new List<SelectListItem>{
-        new SelectListItem("Song", "thing"),
-        new SelectListItem("Speaker", "thing2"),
-        new SelectListItem("Prayer", "3rd thing"),
-    };
 }
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <h1>Create</h1>
 
 <h4>SacramentMeeting</h4>
 <hr />
+<div id="hymn-string" style="display:none" data-value="@Model.Hymns"></div>
+<div id="event-type-string" style="display:none" data-value="@Model.EventTypes"></div>
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create" method="post">
@@ -23,20 +21,6 @@
             </div>
             @Html.EditorFor(meeting => meeting.EventList)
             <div class="form-group" id="event-list">
-                <div id="0" class="form-group event">
-                    <select id="event-type" name="EventList[0].EventType">
-                        <option>Speaker</option>
-                        <option>Hymn</option>
-                        <option>Prayer</option>
-                        <option>Person</option>
-                    </select>
-                    <input name="EventList[0].EventDescription"/>
-                    <input name="EventList[0].FirstName"/>
-                    <input name="EventList[0].LastName"/>
-                    <input name="EventList[0].Topic"/>
-                    <a href="#" id="remove">Remove</a>
-                </div>
-                
             </div>
             <a href="#" id="add">Add</a><br>
             <input type="submit" value="Create" class="btn btn-default" />
@@ -51,15 +35,10 @@
             var eventSelect = `
                 <div id=${i} class="form-group event">
                     <select id="event-type" name="EventList[${i}].EventType"/>
-                        <option>Speaker</option>
-                        <option>Hymn</option>
-                        <option>Prayer</option>
-                        <option>Person</option>
+                        ${document.getElementById("event-type-string").getAttribute("data-value")}
                     </select>
                     <input name="EventList[${i}].EventDescription"/>
-                    <input name="EventList[${i}].FirstName"/>
-                    <input name="EventList[${i}].LastName"/>
-                    <input name="EventList[${i}].Topic"/>
+                    <select name="EventList[${i}].Hymn"/>${document.getElementById("hymn-string").getAttribute("data-value")}</select>
                     <a href="#" id="remove">Remove</a>
                 </div>`;
             $("#event-list").append(eventSelect);
@@ -95,44 +74,83 @@
 
         $("#event-list").on("change", "#event-type", function() {
             i = this.parentNode.id;
-            var element = document.createElement(`select`)
-            element.name = `EventList[${i}].Hymn`
-            appendString = `
-                        <option value="1">Song 1</option>
-                        <option value="2">thing</option>
-                        <option value="3">other thing</option>
-                        <option value="4">Another song</option>
-                        <option value="5">song go here</option>`
-            element.innerHTML = appendString
-            if (this.value === "Hymn") {
-            
-                removeButton = this.parentNode.children[5]
-                for(var i = 0 ; i < 4; i++)
-                {
-                     this.parentNode.children[2].remove();
-                }
-                this.parentNode.appendChild(element);
-                this.parentNode.appendChild(removeButton);
-
+            var element = document.createElement(`select`);
+            element.name = `EventList[${i}].Hymn`;
+            element.innerHTML = document.getElementById("hymn-string").getAttribute("data-value");
+            let correctFields = {
+                "1" : [
+                    "EventType",
+                    "EventDescription",
+                    "Hymn"
+                ], 
+                "2" : [
+                    "EventType",
+                    "EventDescription",
+                    "FirstName",
+                    "LastName"
+                ],
+                "3" : [
+                    "EventType",
+                    "EventDescription",
+                    "FirstName",
+                    "LastName"
+                ],
+                "4" : [
+                    "EventType",
+                    "EventDescription",
+                    "FirstName",
+                    "LastName",
+                    "Topic"
+                ]
             }
-            else if (this.parentNode.children.length !== 6) {
-                var element1 = document.createElement("input");
-                element1.name = `EventList[${i}].FirstName`
-                var element2 = document.createElement("input");
-                element2.name = `EventList[${i}].LastName`
-                var element3 = document.createElement("input");
-                element3.name = `EventList[${i}].Topic`
-                removeButton = this.parentNode.children[3]
 
-                for (var i = 0; i < 2; i++) {
-                    this.parentNode.children[2].remove();
-                }
-                this.parentNode.appendChild(element1)
-                this.parentNode.appendChild(element2)
-                this.parentNode.appendChild(element3)
-                this.parentNode.appendChild(removeButton)
-                
+            let children = [...this.parentNode.children];
+            let parent = this.parentNode;
+            let remove = parent.lastElementChild;
+
+            while (parent.firstChild) {
+                parent.removeChild(parent.firstChild)
             }
+
+            for (var element of correctFields[`${this.value}`]) {
+                item = children.find(item => item.name.includes(element))
+                if (typeof item !== "undefined" ) {
+                    parent.appendChild(item);
+                } else {
+                    var elementToAdd;
+                    switch (element) {
+                        case "EventType":
+                            elementToAdd = document.createElement(`select`);
+                            elementToAdd.name = `EventList[${i}].EventType`;
+                            elementToAdd.innerHTML = document.getElementById("event-type-string").getAttribute("data-value");
+                            break;
+                        case "EventDescription":
+                            elementToAdd = document.createElement("input");
+                            elementToAdd.name = `EventList[${i}].EventDescription`
+                            break;
+                        case "FirstName":
+                            elementToAdd = document.createElement("input");
+                            elementToAdd.name = `EventList[${i}].FirstName`
+                            break;
+                        case "LastName":
+                            elementToAdd = document.createElement("input");
+                            elementToAdd.name = `EventList[${i}].LastName`
+                            break;
+                        case "Topic":
+                            elementToAdd = document.createElement("input");
+                            elementToAdd.name = `EventList[${i}].Topic`
+                            break;
+                        case "Hymn":
+                            elementToAdd = document.createElement(`select`);
+                            elementToAdd.name = `EventList[${i}].Hymn`;
+                            elementToAdd.innerHTML = document.getElementById("hymn-string").getAttribute("data-value");
+                            break;
+                    }
+                    parent.appendChild(elementToAdd);
+                }
+            }
+            parent.appendChild(remove);
+
         })
     });
 </script>

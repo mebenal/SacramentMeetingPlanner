@@ -13,9 +13,9 @@ namespace SacramentMeetingPlanner.Migrations
                 name: "EventTypes",
                 columns: table => new
                 {
-                    EventTypeId = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    EventTypeName = table.Column<string>(type: "TEXT", nullable: false)
+                    EventTypeId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EventTypeName = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -26,10 +26,10 @@ namespace SacramentMeetingPlanner.Migrations
                 name: "Hymns",
                 columns: table => new
                 {
-                    HymnId = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    HymnNumber = table.Column<int>(type: "INTEGER", nullable: false),
-                    HymnName = table.Column<string>(type: "TEXT", nullable: false)
+                    HymnId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    HymnNumber = table.Column<int>(type: "int", nullable: false),
+                    HymnName = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -40,11 +40,11 @@ namespace SacramentMeetingPlanner.Migrations
                 name: "Person",
                 columns: table => new
                 {
-                    PersonId = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    FirstName = table.Column<string>(type: "TEXT", nullable: false),
-                    LastName = table.Column<string>(type: "TEXT", nullable: false),
-                    Title = table.Column<string>(type: "TEXT", nullable: true)
+                    PersonId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -55,9 +55,9 @@ namespace SacramentMeetingPlanner.Migrations
                 name: "SacramentMeetings",
                 columns: table => new
                 {
-                    SacramentMeetingId = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    SacramentMeetingDate = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    SacramentMeetingId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SacramentMeetingDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -68,14 +68,14 @@ namespace SacramentMeetingPlanner.Migrations
                 name: "Events",
                 columns: table => new
                 {
-                    EventId = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    EventTypeId = table.Column<int>(type: "INTEGER", nullable: false),
-                    SacramentMeetingId = table.Column<int>(type: "INTEGER", nullable: false),
-                    PrevEventId = table.Column<int>(type: "INTEGER", nullable: true),
-                    RowId = table.Column<int>(type: "INTEGER", nullable: false),
-                    EventDescription = table.Column<string>(type: "TEXT", nullable: false),
-                    Topic = table.Column<string>(type: "TEXT", nullable: true)
+                    EventId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EventTypeId = table.Column<int>(type: "int", nullable: false),
+                    SacramentMeetingId = table.Column<int>(type: "int", nullable: false),
+                    PrevEventId = table.Column<int>(type: "int", nullable: true),
+                    RowId = table.Column<int>(type: "int", nullable: false),
+                    EventDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Topic = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {

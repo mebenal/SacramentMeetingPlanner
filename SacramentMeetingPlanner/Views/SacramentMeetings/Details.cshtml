@@ -1,4 +1,4 @@
-﻿@model SacramentMeetingPlanner.Models.SacramentMeeting
+﻿@model SacramentMeetingPlanner.Models.SacramentMeetingView
 
 @{
     ViewData["Title"] = "Details";
@@ -16,6 +16,11 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.SacramentMeetingDate)
         </dd>
+        @foreach (EventView item in Model.EventList){
+            <dt class = "col-sm-2">
+                
+            </dt>
+        }
     </dl>
 </div>
 <div>
