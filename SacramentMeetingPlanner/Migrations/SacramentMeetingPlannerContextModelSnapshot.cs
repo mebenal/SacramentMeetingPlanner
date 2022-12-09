@@ -30,7 +30,7 @@ namespace SacramentMeetingPlanner.Migrations
                     b.Property<int>("EventTypeId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("NextEventId")
+                    b.Property<int?>("PrevEventId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("RowId")
@@ -39,15 +39,18 @@ namespace SacramentMeetingPlanner.Migrations
                     b.Property<int>("SacramentMeetingId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Topic")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("EventId");
 
                     b.HasIndex("EventTypeId");
 
-                    b.HasIndex("NextEventId");
+                    b.HasIndex("PrevEventId");
 
                     b.HasIndex("SacramentMeetingId");
 
-                    b.ToTable("Events");
+                    b.ToTable("Events", (string)null);
                 });
 
             modelBuilder.Entity("SacramentMeetingPlanner.Models.EventType", b =>
@@ -62,7 +65,7 @@ namespace SacramentMeetingPlanner.Migrations
 
                     b.HasKey("EventTypeId");
 
-                    b.ToTable("EventTypes");
+                    b.ToTable("EventTypes", (string)null);
                 });
 
             modelBuilder.Entity("SacramentMeetingPlanner.Models.Hymn", b =>
@@ -80,7 +83,7 @@ namespace SacramentMeetingPlanner.Migrations
 
                     b.HasKey("HymnId");
 
-                    b.ToTable("Hymns");
+                    b.ToTable("Hymns", (string)null);
                 });
 
             modelBuilder.Entity("SacramentMeetingPlanner.Models.Person", b =>
@@ -98,12 +101,11 @@ namespace SacramentMeetingPlanner.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("PersonId");
 
-                    b.ToTable("Person");
+                    b.ToTable("Person", (string)null);
                 });
 
             modelBuilder.Entity("SacramentMeetingPlanner.Models.SacramentMeeting", b =>
@@ -117,7 +119,7 @@ namespace SacramentMeetingPlanner.Migrations
 
                     b.HasKey("SacramentMeetingId");
 
-                    b.ToTable("SacramentMeetings");
+                    b.ToTable("SacramentMeetings", (string)null);
                 });
 
             modelBuilder.Entity("SacramentMeetingPlanner.Models.Event", b =>
@@ -128,9 +130,9 @@ namespace SacramentMeetingPlanner.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SacramentMeetingPlanner.Models.Event", "NextEvent")
+                    b.HasOne("SacramentMeetingPlanner.Models.Event", "PrevEvent")
                         .WithMany()
-                        .HasForeignKey("NextEventId");
+                        .HasForeignKey("PrevEventId");
 
                     b.HasOne("SacramentMeetingPlanner.Models.SacramentMeeting", "SacramentMeeting")
                         .WithMany("EventList")
@@ -140,7 +142,7 @@ namespace SacramentMeetingPlanner.Migrations
 
                     b.Navigation("EventType");
 
-                    b.Navigation("NextEvent");
+                    b.Navigation("PrevEvent");
 
                     b.Navigation("SacramentMeeting");
                 });

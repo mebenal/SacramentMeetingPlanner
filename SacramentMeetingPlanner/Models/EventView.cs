@@ -6,7 +6,7 @@
         public string EventDescription { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string Hymn { get; set; }
+        public int Hymn { get; set; }
         public string Topic { get; set; }
     }
 }

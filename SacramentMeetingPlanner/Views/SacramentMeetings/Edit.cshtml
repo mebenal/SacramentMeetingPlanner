@@ -20,7 +20,7 @@
             <div class="form-group" id="event-list">
                 @foreach(var value in Model.EventList)
                 {   
-                    @{var i = 0;}
+                    int i = 0;
                     //If statement goes here, check if event is Hymn or not.
                         <div id="@i" class="form-group event">
                         <select id="event-type" name="EventList[@i].EventType">

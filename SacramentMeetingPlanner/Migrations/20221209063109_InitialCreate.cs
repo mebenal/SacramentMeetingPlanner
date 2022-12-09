@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SacramentMeetingPlanner.Migrations
 {
-    public partial class Redesign1 : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -43,7 +43,8 @@ namespace SacramentMeetingPlanner.Migrations
                     PersonId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     FirstName = table.Column<string>(type: "TEXT", nullable: false),
-                    LastName = table.Column<string>(type: "TEXT", nullable: false)
+                    LastName = table.Column<string>(type: "TEXT", nullable: false),
+                    Title = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -71,16 +72,17 @@ namespace SacramentMeetingPlanner.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     EventTypeId = table.Column<int>(type: "INTEGER", nullable: false),
                     SacramentMeetingId = table.Column<int>(type: "INTEGER", nullable: false),
-                    NextEventId = table.Column<int>(type: "INTEGER", nullable: true),
+                    PrevEventId = table.Column<int>(type: "INTEGER", nullable: true),
                     RowId = table.Column<int>(type: "INTEGER", nullable: false),
-                    EventDescription = table.Column<string>(type: "TEXT", nullable: false)
+                    EventDescription = table.Column<string>(type: "TEXT", nullable: false),
+                    Topic = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Events", x => x.EventId);
                     table.ForeignKey(
-                        name: "FK_Events_Events_NextEventId",
-                        column: x => x.NextEventId,
+                        name: "FK_Events_Events_PrevEventId",
+                        column: x => x.PrevEventId,
                         principalTable: "Events",
                         principalColumn: "EventId");
                     table.ForeignKey(
@@ -103,9 +105,9 @@ namespace SacramentMeetingPlanner.Migrations
                 column: "EventTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Events_NextEventId",
+                name: "IX_Events_PrevEventId",
                 table: "Events",
-                column: "NextEventId");
+                column: "PrevEventId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Events_SacramentMeetingId",

@@ -11,8 +11,8 @@ using SacramentMeetingPlanner.Data;
 namespace SacramentMeetingPlanner.Migrations
 {
     [DbContext(typeof(SacramentMeetingPlannerContext))]
-    [Migration("20221208064619_Redesign1")]
-    partial class Redesign1
+    [Migration("20221209063109_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -32,7 +32,7 @@ namespace SacramentMeetingPlanner.Migrations
                     b.Property<int>("EventTypeId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("NextEventId")
+                    b.Property<int?>("PrevEventId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("RowId")
@@ -41,11 +41,14 @@ namespace SacramentMeetingPlanner.Migrations
                     b.Property<int>("SacramentMeetingId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Topic")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("EventId");
 
                     b.HasIndex("EventTypeId");
 
-                    b.HasIndex("NextEventId");
+                    b.HasIndex("PrevEventId");
 
                     b.HasIndex("SacramentMeetingId");
 
@@ -99,6 +102,9 @@ namespace SacramentMeetingPlanner.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Title")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("PersonId");
 
                     b.ToTable("Person");
@@ -126,9 +132,9 @@ namespace SacramentMeetingPlanner.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SacramentMeetingPlanner.Models.Event", "NextEvent")
+                    b.HasOne("SacramentMeetingPlanner.Models.Event", "PrevEvent")
                         .WithMany()
-                        .HasForeignKey("NextEventId");
+                        .HasForeignKey("PrevEventId");
 
                     b.HasOne("SacramentMeetingPlanner.Models.SacramentMeeting", "SacramentMeeting")
                         .WithMany("EventList")
@@ -138,7 +144,7 @@ namespace SacramentMeetingPlanner.Migrations
 
                     b.Navigation("EventType");
 
-                    b.Navigation("NextEvent");
+                    b.Navigation("PrevEvent");
 
                     b.Navigation("SacramentMeeting");
                 });

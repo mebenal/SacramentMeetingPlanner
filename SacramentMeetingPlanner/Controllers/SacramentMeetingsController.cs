@@ -100,19 +100,79 @@ namespace SacramentMeetingPlanner.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SacramentMeetingView sacramentMeeting)
         {
+            List<EventType> eventTypes = await _context.EventTypes.ToListAsync();
+            List<Hymn> hymns = await _context.Hymns.ToListAsync();
+
+            SacramentMeeting dbMeeting = new()
+            {
+                SacramentMeetingDate = sacramentMeeting.SacramentMeetingDate
+            };
+
+            _context.SacramentMeetings.Add(dbMeeting);
+            await _context.SaveChangesAsync();
+
             List<Event> sacramentMeetingEvents = new();
+            int? lastEventId = null;
             foreach (var item in sacramentMeeting.EventList)
             {
-                sacramentMeetingEvents.Add(
-                    new()
-                    {
-                    });;
+                Event newEvent = new()
+                {
+                    PrevEventId = lastEventId,
+                    SacramentMeetingId = dbMeeting.SacramentMeetingId,
+                    EventType = eventTypes
+                        .Where(et => et.EventTypeName == item.EventType)
+                        .First(),
+                    EventDescription = item.EventDescription
+                };
+                switch (newEvent.EventType.EventTypeName)
+                {
+                    case "Hymn":
+                        newEvent.RowId = hymns.Where(h => h.HymnNumber == item.Hymn).FirstOrDefault().HymnId;
+                        break;
+                    case "Speaker":
+                        newEvent.Topic = item.Topic;
+                        Person person1 = _context.Person.Where(p => p.FirstName == item.FirstName && p.LastName == item.LastName).FirstOrDefault();
+                        if (person1 is null)
+                        {
+                            person1 = new()
+                            {
+                                FirstName = item.FirstName,
+                                LastName = item.LastName
+                            };
+                            _context.Person.Add(person1);
+                            await _context.SaveChangesAsync();
+                        }
+                        newEvent.RowId = person1.PersonId;
+                        break;
+                    case "Person":
+                    case "Prayer":
+                        Person person2 = _context.Person.Where(p => p.FirstName == item.FirstName && p.LastName == item.LastName).FirstOrDefault();
+                        if (person2 is null)
+                        {
+                            person2 = new()
+                            {
+                                FirstName = item.FirstName,
+                                LastName = item.LastName
+                            };
+                            _context.Person.Add(person2);
+                            await _context.SaveChangesAsync();
+                        }
+                        newEvent.RowId = person2.PersonId;
+                        break;
+                }
+                _context.Events.Add(newEvent);
+                _context.SaveChanges();
+
+                lastEventId = newEvent.EventId;
             }
             if (ModelState.IsValid)
             {
-                _context.Add(sacramentMeeting);
-                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                _context.Remove(dbMeeting);
+                await _context.SaveChangesAsync();
             }
             return View(sacramentMeeting);
         }

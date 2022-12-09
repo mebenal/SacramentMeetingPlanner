@@ -30,7 +30,7 @@
                         <option>Prayer</option>
                         <option>Person</option>
                     </select>
-                    <input name="EventList[0].EventDetails"/>
+                    <input name="EventList[0].EventDescription"/>
                     <input name="EventList[0].FirstName"/>
                     <input name="EventList[0].LastName"/>
                     <input name="EventList[0].Topic"/>
@@ -56,7 +56,7 @@
                         <option>Prayer</option>
                         <option>Person</option>
                     </select>
-                    <input name="EventList[${i}].EventDetails"/>
+                    <input name="EventList[${i}].EventDescription"/>
                     <input name="EventList[${i}].FirstName"/>
                     <input name="EventList[${i}].LastName"/>
                     <input name="EventList[${i}].Topic"/>
@@ -72,11 +72,22 @@
             children.each( function() {
                 if (this.id > removalId) {
                     this.id = this.id - 1
-                    this.children[0].name = `EventList[${this.id}].EventType`
-                    this.children[1].name = `EventList[${this.id}].EventDetails`
-                    this.children[2].name = `EventList[${this.id}].FirstName`
-                    this.children[3].name = `EventList[${this.id}].LastName`
-                    this.children[4].name = `EventList[${this.id}].Topic`
+                    for (var child = 0; child < this.children.length; child++){
+                        var startStr = `EventList[${this.id}].`;
+                        if (this.children[child].name.includes("EventType")){
+                            this.children[child].name =`${startStr}EventType`;
+                        } else if (this.children[child].name.includes("EventDescription")){
+                            this.children[child].name =`${startStr}EventDescription`;
+                        } else if (this.children[child].name.includes("FirstName")){
+                            this.children[child].name =`${startStr}FirstName`;
+                        } else if (this.children[child].name.includes("LastName")){
+                            this.children[child].name =`${startStr}LastName`;
+                        } else if (this.children[child].name.includes("Topic")){
+                            this.children[child].name =`${startStr}Topic`;
+                        } else if (this.children[child].name.includes("Hymn")){
+                            this.children[child].name =`${startStr}Hymn`;
+                        }
+                    }
                 }
             })
             children[removalId].remove()
