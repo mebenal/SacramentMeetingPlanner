@@ -12,6 +12,7 @@ namespace SacramentMeetingPlanner.Models
         public int? NextEventId { get; set; }
         public int RowId { get; set; }
         public string EventDescription { get; set; }
+        public string Topic { get; set; }
         
         public EventType EventType { get; set; }
         public SacramentMeeting SacramentMeeting { get; set; }

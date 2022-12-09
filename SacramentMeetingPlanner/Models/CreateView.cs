@@ -5,7 +5,9 @@ namespace SacramentMeetingPlanner.Models
     public class CreateView
     {
         public DateTime SacramentMeetingDate { get; set; }
-        public SelectList Hynns { get; set; }
-        public SelectList EventTypes { get; set; }
+        public string Hynns { get; set; }
+        public string EventTypes { get; set; }
+
+        public ICollection<Event>? EventList { get; set; }
     }
 }

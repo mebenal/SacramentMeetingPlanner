@@ -73,12 +73,22 @@ namespace SacramentMeetingPlanner.Controllers
         // GET: SacramentMeetings/Create
         public IActionResult Create()
         {
-            SelectList hymns = new(_context.Hymns.ToList(), "HymnId", "FullHymn");
-            SelectList eventTypes = new(_context.EventTypes.ToList(), "EventTypeId", "EventName");
+            List<Hymn> hymns = _context.Hymns.ToList();
+            string hymnString = "";
+            foreach (Hymn hymn in hymns)
+            {
+                hymnString += $"<option value=\"{hymn.HymnId}\">{hymn.FullHymn}</option>";
+            }
+            List<EventType> eventTypes = _context.EventTypes.ToList();
+            string eventTypeString = "";
+            foreach (EventType eventType in eventTypes)
+            {
+                eventTypeString += $"<option value=\"{eventType.EventTypeId}\">{eventType.EventTypeName}</option>";
+            }
             CreateView createView = new()
             {
-                Hynns = hymns,
-                EventTypes = eventTypes
+                Hynns = hymnString,
+                EventTypes = eventTypeString
             };
             return View(createView);
         }
