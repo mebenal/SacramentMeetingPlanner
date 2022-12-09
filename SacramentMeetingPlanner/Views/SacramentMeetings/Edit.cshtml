@@ -19,12 +19,20 @@
             </div>
             <div class="form-group" id="event-list">
                 @foreach(var value in Model.EventList)
-                {
-                    <div id=@value.EventId class="form-group event">
-                        <input id="type" name="EventList[@(value.EventId)].EventType" value=@value.EventTypeId />
-                        <input id="value@(value.EventId)" name=EventList[@(value.EventId)].EventDetails value=@value.RowId />
-                        <input type="hidden" name="EventList[@value.EventId].localId" value="0"/>
-                        <input type="hidden" name="EventList[@value.EventId].Id" value="@value.EventId"/>
+                {   
+                    @{var i = 0;}
+                    //If statement goes here, check if event is Hymn or not.
+                        <div id="@i" class="form-group event">
+                        <select id="event-type" name="EventList[@i].EventType">
+                            <option>Speaker</option>
+                            <option>Hymn</option>
+                            <option>Prayer</option>
+                            <option>Person</option>
+                        </select>
+                        <input name="EventList[@i].EventDetails"/>
+                        <input name="EventList[@i].FirstName"/>
+                        <input name="EventList[@i].LastName"/>
+                        <input name="EventList[@i].Topic"/>
                         <a href="#" id="remove">Remove</a>
                     </div>
                 }
@@ -41,9 +49,16 @@
             var i = $("#event-list").children().length;
             var eventSelect = `
                 <div id=${i} class="form-group event">
-                    <input id="type" name="EventList[${i}].EventType"/>
-                    <input id="value${i}" name="EventList[${i}].keyValuePairs.Value"/>
-                    <input type="hidden" name="EventList[${i}].id" value="0"/>
+                    <select id="event-type" name="EventList[${i}].EventType"/>
+                        <option>Speaker</option>
+                        <option>Hymn</option>
+                        <option>Prayer</option>
+                        <option>Person</option>
+                    </select>
+                    <input name="EventList[${i}].EventDetails"/>
+                    <input name="EventList[${i}].FirstName"/>
+                    <input name="EventList[${i}].LastName"/>
+                    <input name="EventList[${i}].Topic"/>
                     <a href="#" id="remove">Remove</a>
                 </div>`;
             $("#event-list").append(eventSelect);
@@ -54,27 +69,60 @@
             var children = $("#event-list").children()
 
             children.each( function() {
-                console.log("I am printing here")
-                if (this.id > removalId)
-                {
+                if (this.id > removalId) {
                     this.id = this.id - 1
                     this.children[0].name = `EventList[${this.id}].EventType`
-                    this.children[1].name = `EventList[${this.id}].EventType[]`
-                    this.children[1].id = `value${this.id}`
-                    
+                    this.children[1].name = `EventList[${this.id}].EventDetails`
+                    this.children[2].name = `EventList[${this.id}].FirstName`
+                    this.children[3].name = `EventList[${this.id}].LastName`
+                    this.children[4].name = `EventList[${this.id}].Topic`
                 }
             })
             children[removalId].remove()
         });
 
-        $("#event-list").on("input", "#type", function() {
-            var inputValue = this.value
-            var currentId = this.parentNode.id
-
-            $("#event-list").find(`#key${currentId}`).attr("value", `EventList[${currentId}].EventType[${inputValue}]`)
+        $("#event-list").on("change", "#event-type", function() {
+            i = this.parentNode.id;
+            var element = document.createElement(`select`)
+            element.name = `EventList[${i}].Hymn`
+            appendString = `
+                        <option value="1">Song 1</option>
+                        <option value="2">thing</option>
+                        <option value="3">other thing</option>
+                        <option value="4">Another song</option>
+                        <option value="5">song go here</option>`
+            element.innerHTML = appendString
+            if (this.value === "Hymn") {
             
+                removeButton = this.parentNode.children[5]
+                for(var i = 0 ; i < 4; i++)
+                {
+                     this.parentNode.children[2].remove();
+                }
+                this.parentNode.appendChild(element);
+                this.parentNode.appendChild(removeButton);
+
+            }
+            else if (this.parentNode.children.length !== 6) {
+                var element1 = document.createElement("input");
+                element1.name = `EventList[${i}].FirstName`
+                var element2 = document.createElement("input");
+                element2.name = `EventList[${i}].LastName`
+                var element3 = document.createElement("input");
+                element3.name = `EventList[${i}].Topic`
+                removeButton = this.parentNode.children[3]
+
+                for (var i = 0; i < 2; i++) {
+                    this.parentNode.children[2].remove();
+                }
+                this.parentNode.appendChild(element1)
+                this.parentNode.appendChild(element2)
+                this.parentNode.appendChild(element3)
+                this.parentNode.appendChild(removeButton)
+                
+            }
         })
-    })
+    });
 </script>
 <div>
     <a asp-action="Index">Back to List</a>
