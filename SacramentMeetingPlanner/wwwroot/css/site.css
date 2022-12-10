@@ -39,3 +39,19 @@ td  {
   float: left;
   overflow: visible;
 }
+
+/* Create Page Css */
+
+.eventItems > td{
+  border: none;
+  height: unset;
+  padding-bottom: 5px;
+}
+
+thead > .eventItems > td{
+  padding-bottom: unset;
+}
+
+.eventTable {
+  width: 150%
+}

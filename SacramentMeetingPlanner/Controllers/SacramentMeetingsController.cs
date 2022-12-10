@@ -163,7 +163,7 @@ namespace SacramentMeetingPlanner.Controllers
                             Meeting = childModel.Meeting,
                         };
 
-                        currentMeeting.EventList.Add(childModel);
+                        sacramentMeeting.EventList.Add(newChild);
                     }
                 }
                 await _context.SaveChangesAsync();

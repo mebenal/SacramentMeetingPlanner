@@ -26,15 +26,23 @@
                 <input asp-for="Presiding" class="form-control" />
                 <span asp-validation-for="Presiding" class="text-danger"></span>
             </div>
-            <div class="form-group" id="event-list">
-            <div id=0 class="form-group event">
-                <input id="type" name="EventList[0].EventType" />
-                <input id="details" name="EventList[0].EventDetails" />
-                <input type="hidden" name="EventList[0].localId" value="0" />
-                <a href="#" id="remove">Remove</a>
-            </div>
-                @Html.EditorFor(meeting => meeting.EventList)
-            </div>
+            <table class="eventTable">
+                <thead>
+                    <tr class="eventItems">
+                        <td><label class="control-label">Event</label></td>
+                        <td><label class="control-label">Details</label></td>
+                    </tr>
+                </thead>
+                <tbody id="event-list">
+                    <tr id=0 class="form-group event eventItems">
+                        <td><input id="type" class="form-control" name="EventList[0].EventType" /></td>
+                        <td><input id="details" class="form-control" name="EventList[0].EventDetails" /></td>
+                        <input type="hidden" name="EventList[0].localId" value="0" />
+                        <td><a href="#" id="remove">Remove</a></td>
+                    </tr>
+                    @Html.EditorFor(meeting => meeting.EventList)
+                </table>
+            </tbody>
             <a href="#" id="add">Add</a><br>
             <input type="submit" value="Create" class="btn btn-default" />
         </form>
@@ -46,21 +54,20 @@
             event.preventDefault();
             var i = $("#event-list").children().length;
             var eventSelect = `
-                <div id=${i} class="form-group event">
-                    <input id="type" name="EventList[${i}].EventType"/>
-                    <input id="details" name="EventList[${i}].EventDetails"/>
+                <tr id=${i} class="form-group event eventItems">
+                    <td><input id="type" class="form-control" name="EventList[${i}].EventType" /></td>
+                    <td><input id="details" class="form-control" name="EventList[${i}].EventDetails" /></td>
                     <input type="hidden" name="EventList[${i}].localId" value="${i}"/>
-                    <a href="#" id="remove">Remove</a>
-                </div>`;
+                    <td><a href="#" id="remove">Remove</a></td>
+                </tr>`;
             $("#event-list").append(eventSelect);
         });
 
         $("#event-list").on("click", "#remove", function() {
-            var removalId = this.parentNode.id;
+            var removalId = this.parentNode.parentNode.id;
             var children = $("#event-list").children()
 
             children.each( function() {
-                console.log("I am printing here")
                 if (this.id > removalId)
                 {
                     this.id = this.id - 1
