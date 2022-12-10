@@ -37,8 +37,13 @@ namespace SacramentMeetingPlanner.Controllers
         public Calendar buildCal(int month, int year)
         {
             DateTime calBegin, calEnd;
-
-            //DateTime today = DateTime.Now;
+            if(month == 0 || year == 0)
+            {
+                DateTime today = DateTime.Now;
+                month = today.Month;
+                year = today.Year;
+            }
+            
             calBegin = new DateTime(year, month, 1);
             calBegin = calBegin.AddDays( -(int)calBegin.DayOfWeek);
 
