@@ -1,4 +1,5 @@
-﻿@model SacramentMeetingPlanner.Models.SacramentMeetingView
+﻿@using System.Reflection
+@model SacramentMeetingPlanner.Models.SacramentMeetingView
 
 @{
     ViewData["Title"] = "Details";
@@ -20,6 +21,15 @@
             <dt class = "col-sm-2">
                 
             </dt>
+            foreach (PropertyInfo propertyInfo in item.GetType()
+            .GetProperties(
+            BindingFlags.Public
+            | BindingFlags.Instance))
+            {
+                if (propertyInfo.GetValue(item) is not null){
+
+                }
+            }
         }
     </dl>
 </div>
