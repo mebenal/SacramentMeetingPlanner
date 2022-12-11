@@ -25,6 +25,7 @@
                 <input asp-for="SacramentMeetingDate" asp-format="{0:yyyy-MM-dd}" class="form-control" value=@DateTime.Now/>
                 <span asp-validation-for="SacramentMeetingDate" class="text-danger"></span>
             </div>
+            <label>Events</label>
             <div class="form-group" id="event-list">
             @foreach (var (item, index) in Model.EventList?.Select((item, index) => (item, index)))
         {
@@ -46,11 +47,8 @@
                                                             <select name="EventList[@index].HymnId" class="form-control">
                                                             @{
                                                                 foreach (Hymn hymn in Model.Hymns){
-                                                                    bool selected = item.HymnId == hymn.HymnId;
-                                                                    if (selected) {
-                                                                        <option value="@hymn.HymnId" selected>@hymn.FullHymn</option>
-                                                                    } else {
-                                                                        <option value="@hymn.HymnId">@hymn.FullHymn</option>
+                                                                    string selected = item.HymnId == hymn.HymnId ? "selected" : "";
+                                                                    <option value="@hymn.HymnId" selected>@hymn.FullHymn</option>
                                                                     }
                                                                     }
                                                                 }

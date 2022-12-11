@@ -24,27 +24,33 @@ namespace SacramentMeetingPlanner.Controllers
         // GET: SacramentMeetings
         
         // start and end of the whole cal display
-        public async Task<IActionResult> Index()
+       public async Task<IActionResult> Index(int month, int year)
         {
-            CalendarModel model = new()
-            {
+            CalendarModel model = new CalendarModel {
                 Meetings = await _context.SacramentMeetings.ToListAsync(),
-                Calendar = BuildCal(),
+                Calendar = buildCal(month, year),
             };
+            
             return View(model);
         }
 
-        public Calendar BuildCal()
+        public Calendar buildCal(int month, int year)
         {
             DateTime calBegin, calEnd;
 
-            DateTime today = DateTime.Now;
-            calBegin = new DateTime(today.Year, today.Month, 1);
+            if (month == 0 || year == 0)
+            {
+                DateTime today = DateTime.Now;
+                month = today.Month;
+                year = today.Year;
+            }
+
+            calBegin = new DateTime(year, month, 1);
             calBegin = calBegin.AddDays( -(int)calBegin.DayOfWeek);
 
-            calEnd = new DateTime(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month));
+            calEnd = new DateTime(year, month, DateTime.DaysInMonth(year, month));
             
-            return new Calendar(calBegin, calEnd);
+            return new Calendar(calBegin, calEnd, month, year);
         }
 
 
