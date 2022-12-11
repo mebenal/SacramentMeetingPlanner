@@ -1,30 +1,264 @@
-﻿@model SacramentMeetingPlanner.Models.SacramentMeeting
+﻿@using System.ComponentModel
+@using System.Reflection
+@model SacramentMeetingPlanner.Models.SacramentMeetingView
 
 @{
     ViewData["Title"] = "Edit";
+    List<string> doNotDisplay = new()
+    {
+        "EventTypeId",
+        "HymnId",
+        "EventId"
+    };
 }
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <h1>Edit</h1>
 
 <h4>SacramentMeeting</h4>
 <hr />
+<div id="hymn-string" style="display:none" data-value="@Model.HymnsString"></div>
+<div id="event-type-string" style="display:none" data-value="@Model.EventTypeString"></div>
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="SacramentDate" class="control-label"></label>
-                <input asp-for="SacramentDate" class="form-control" />
-                <span asp-validation-for="SacramentDate" class="text-danger"></span>
+        <form asp-action="Edit" method="post">
+             <div class="form-group date-padding">
+                <label asp-for="SacramentMeetingDate" class="control-label"></label>
+                <input asp-for="SacramentMeetingDate" class="form-control" />
+                <span asp-validation-for="SacramentMeetingDate" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+            <div class="form-group" id="event-list">
+            @foreach (var (item, index) in Model.EventList?.Select((item, index) => (item, index)))
+        {
+            <div id="@index" class="form-group event">
+                @{
+                    foreach (PropertyInfo propertyInfo in item.GetType()
+                            .GetProperties(
+                            BindingFlags.Public
+                            | BindingFlags.Instance))
+                    {
+                        if (!doNotDisplay.Contains(propertyInfo.Name))
+                        {
+                            if (propertyInfo.GetValue(item) is not null)
+                            { 
+                                    object[] memberInfo = propertyInfo.GetCustomAttributes(typeof(DisplayNameAttribute), true);
+                                    string nameToShow = memberInfo.Length != 0 ? memberInfo.Cast<DisplayNameAttribute>().Single().DisplayName : propertyInfo.Name; 
+                                                    <label>@nameToShow</label>        
+                                    switch (propertyInfo.Name) {
+                                                case "Hymn":
+                                                                            <select name="EventList[@index].HymnId" class="form-control">
+                                                                            @{
+                                                                foreach (Hymn hymn in Model.Hymns){
+                                                                    bool selected = item.HymnId == hymn.HymnId;
+                                                                    if (selected) {
+                                                                                                        <option value="@hymn.HymnId" selected>@hymn.FullHymn</option>
+                                                                    } else {
+                                                                                                        <option value="@hymn.HymnId">@hymn.FullHymn</option>
+                                                                    }
+                                                                    }
+                                                                                }
+                                                                            </select>
+                                                    break;
+                                                case "EventType":
+                                                                            <select id="event-type" name="EventList[@index].EventTypeId" class="form-control">
+                                                                            @{
+                                                                foreach (EventType eventType in Model.EventType){
+                                                                    bool selected = item.EventTypeId == eventType.EventTypeId;
+                                                                    if (selected) {
+                                                                                                        <option value="@eventType.EventTypeId" selected>@eventType.EventTypeName</option>
+                                                                    }
+                                                                    else {
+                                                                                                        <option value="@eventType.EventTypeId">@eventType.EventTypeName</option>
+                                                                    }
+                                                                    }
+                                                                                }
+                                                                            </select>
+                                                    break;
+                                                default:
+                                                                            <input name="EventList[@index].@propertyInfo.Name" value="@propertyInfo.GetValue(item)" class="form-control">
+                                                    break;
+                                            }
+                            }
+                        }
+
+                    }
+                                    <input name="EventList[@index].EventId" value="@item.EventId" hidden/>
+                                    <a href="#" id="remove">Remove</a>
+                                    <hr />
+                }
             </div>
+        }
+        </div>
+            <a href="#" id="add">Add</a><br>
+            <input type="submit" value="Edit" class="btn btn-default" />
         </form>
     </div>
 </div>
+<script type="text/javascript">
+    $(function () {
+        $("#add").click(function (event) {
+            event.preventDefault();
+            var i = $("#event-list").children().length;
+            var eventSelect = `
+                <div id=${i} class="form-group event">
+                    <label>Agenda Item</label>
+                    <select id="event-type" name="EventList[${i}].EventTypeId" class="form-control"/>
+                        ${document.getElementById("event-type-string").getAttribute("data-value")}
+                    </select>
+                    <label>Agenda Item Description</label>
+                    <input name="EventList[${i}].EventDescription" class="form-control"/>
+                    <label>Hymn</label>
+                    <select name="EventList[${i}].HymnId" class="form-control"/>${document.getElementById("hymn-string").getAttribute("data-value")}</select>
+                    <a href="#" id="remove">Remove</a>
+                </div>`;
+            $("#event-list").append(eventSelect);
+        });
 
+        $("#event-list").on("click", "#remove", function() {
+            var removalId = this.parentNode.id;
+            var children = $("#event-list").children()
+
+            children.each( function() {
+                if (this.id > removalId) {
+                    this.id = this.id - 1
+                    for (var child = 0; child < this.children.length; child++){
+                        var startStr = `EventList[${this.id}].`;
+                        if (this.children[child].name.includes("EventTypeId")){
+                            this.children[child].name =`${startStr}EventTypeId`;
+                        } else if (this.children[child].name.includes("EventDescription")){
+                            this.children[child].name =`${startStr}EventDescription`;
+                        } else if (this.children[child].name.includes("FirstName")){
+                            this.children[child].name =`${startStr}FirstName`;
+                        } else if (this.children[child].name.includes("LastName")){
+                            this.children[child].name =`${startStr}LastName`;
+                        } else if (this.children[child].name.includes("Topic")){
+                            this.children[child].name =`${startStr}Topic`;
+                        } else if (this.children[child].name.includes("HymnId")){
+                            this.children[child].name =`${startStr}HymnId`;
+                        } else if (this.children[child].name.includes("EventId")) {
+                            this.children[child].name =`${startStr}EventId`;
+                        }
+                    }
+                }
+            })
+            children[removalId].remove()
+        });
+
+        $("#event-list").on("change", "#event-type", function() {
+            i = this.parentNode.id;
+            var element = document.createElement(`select`);
+            element.name = `EventList[${i}].Hymn`;
+            element.innerHTML = document.getElementById("hymn-string").getAttribute("data-value");
+            let correctFields = {
+                "1" : [
+                    "EventTypeId",
+                    "EventDescription",
+                    "HymnId"
+                ], 
+                "2" : [
+                    "EventTypeId",
+                    "EventDescription",
+                    "FirstName",
+                    "LastName"
+                ],
+                "3" : [
+                    "EventTypeId",
+                    "EventDescription",
+                    "FirstName",
+                    "LastName"
+                ],
+                "4" : [
+                    "EventTypeId",
+                    "EventDescription",
+                    "FirstName",
+                    "LastName",
+                    "Topic"
+                ]
+            }
+            let notIn = ["label", "hr"]
+            let children = [...this.parentNode.children];
+            children = children.filter(i => !notIn.includes(i.localName));
+            let parent = this.parentNode;
+            let remove = parent.lastElementChild;
+
+            while (parent.firstChild) {
+                parent.removeChild(parent.firstChild)
+            }
+            for (var element of correctFields[`${this.value}`]) {
+                item = children.find(item => item.name.includes(element))
+                if (typeof item !== "undefined" ) {
+                    var label = document.createElement("label");
+                    switch (element) {
+                        case "EventTypeId":
+                            label.innerHTML = "Agenda Item";
+                            break;
+                        case "EventDescription":
+                            label.innerHTML = "Adgenda Item Description";
+                            break;
+                        case "FirstName":
+                            label.innerHTML = "First Name";
+                            break;
+                        case "LastName":
+                            label.innerHTML = "Last Name";
+                            break;
+                        case "Topic":
+                            label.innerHTML = "Topic";
+                            break;
+                        case "HymnId":
+                            label.innerHTML = "Hymn";
+                            break;
+                    }
+                    parent.appendChild(label);
+                    parent.appendChild(item);
+                } else {
+                    var label = document.createElement("label");
+                    var elementToAdd;
+                    switch (element) {
+                        case "EventTypeId":
+                            elementToAdd = document.createElement(`select`);
+                            elementToAdd.name = `EventList[${i}].EventTypeId`;
+                            elementToAdd.innerHTML = document.getElementById("event-type-string").getAttribute("data-value");
+                            label.innerHTML = "Agenda Item";
+                            break;
+                        case "EventDescription":
+                            elementToAdd = document.createElement("input");
+                            elementToAdd.name = `EventList[${i}].EventDescription`
+                            label.innerHTML = "Adgenda Item Description";
+                            break;
+                        case "FirstName":
+                            elementToAdd = document.createElement("input");
+                            elementToAdd.name = `EventList[${i}].FirstName`
+                            label.innerHTML = "First Name";
+                            break;
+                        case "LastName":
+                            elementToAdd = document.createElement("input");
+                            elementToAdd.name = `EventList[${i}].LastName`
+                            label.innerHTML = "Last Name";
+                            break;
+                        case "Topic":
+                            elementToAdd = document.createElement("input");
+                            elementToAdd.name = `EventList[${i}].Topic`
+                            label.innerHTML = "Topic";
+                            break;
+                        case "HymnId":
+                            elementToAdd = document.createElement(`select`);
+                            elementToAdd.name = `EventList[${i}].HymnId`;
+                            elementToAdd.innerHTML = document.getElementById("hymn-string").getAttribute("data-value");
+                            label.innerHTML = "Hymn";
+                            break;
+                    }
+                    elementToAdd.classList.add("form-control");
+                    parent.appendChild(label);
+                    parent.appendChild(elementToAdd);
+                }
+            }
+            var hr = document.createElement("hr");
+            parent.appendChild(hr)
+            parent.appendChild(remove);
+
+        })
+    });
+</script>
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
