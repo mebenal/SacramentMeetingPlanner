@@ -1,7 +1,13 @@
-﻿@model SacramentMeetingPlanner.Models.SacramentMeetingView
+﻿@using System.Reflection
+@using System.ComponentModel
+@model SacramentMeetingPlanner.Models.SacramentMeetingView
 
 @{
     ViewData["Title"] = "Delete";
+    List<string> doNotDisplay = new() {
+        "EventTypeId",
+        "EventType"
+    };
 }
 
 <h1>Delete</h1>
@@ -11,12 +17,45 @@
     <h4>SacramentMeeting</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.SacramentMeetingDate)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.SacramentMeetingDate)
         </dd>
+        @foreach (EventView item in Model.EventList)
+        {
+            <div class="row-sm-2 row">
+                <h2>@item.EventType</h2>
+                @{
+                    foreach (PropertyInfo propertyInfo in item.GetType()
+                    .GetProperties(
+                    BindingFlags.Public
+                    | BindingFlags.Instance))
+                    {
+                        if (!doNotDisplay.Contains(propertyInfo.Name))
+                        {
+                            if (propertyInfo.GetValue(item) is not null)
+                            {
+                                <div class="col-3">
+                                    <dt>
+                                        @{
+                                            object[] memberInfo = propertyInfo.GetCustomAttributes(typeof(DisplayNameAttribute), true);
+                                            string nameToShow = memberInfo.Length != 0 ? memberInfo.Cast<DisplayNameAttribute>().Single().DisplayName : propertyInfo.Name;
+                                        }
+                                        @nameToShow
+                                    </dt>
+                                    <dd>
+                                        @propertyInfo.GetValue(item)
+                                    </dd>
+                                </div>
+                            }
+                        }
+
+                    }
+                }
+            </div>
+        }
     </dl>
     
     <form asp-action="Delete">

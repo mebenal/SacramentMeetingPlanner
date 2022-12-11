@@ -329,7 +329,15 @@ namespace SacramentMeetingPlanner.Controllers
             existingtMeeting.SacramentMeetingDate = sacramentMeeting.SacramentMeetingDate;
             await _context.SaveChangesAsync();
 
-            List<int> eventIds = _context.Events.Select(e => e.EventId).ToList();
+            List<int> remainingEventIds = sacramentMeeting.EventList.Where(e => e.EventId is not null).Select(e => e.EventId).Cast<int>().ToList();
+            List<int> toRemoveList = _context.Events.Where(e => !remainingEventIds.Contains(e.EventId) && e.SacramentMeetingId == existingtMeeting.SacramentMeetingId).Select(e => e.EventId).ToList();
+
+            foreach (int idToRemove in toRemoveList)
+            {
+                Event toRemove = _context.Events.Find(idToRemove);
+                _context.Events.Remove(toRemove);
+            }
+            await _context.SaveChangesAsync();
 
             int? lastEventId = null;
             foreach (EventView item in sacramentMeeting.EventList)
@@ -342,15 +350,13 @@ namespace SacramentMeetingPlanner.Controllers
                     {
                         SacramentMeetingId = existingtMeeting.SacramentMeetingId
                     };
-                } else
-                {
-
                 }
                 updateEvent.PrevEventId = lastEventId;
                 updateEvent.EventType = eventTypes
                                             .Where(et => et.EventTypeId == item.EventTypeId)
                                             .First();
                 updateEvent.EventDescription = item.EventDescription;
+                updateEvent.Topic = null;
                 switch (updateEvent.EventType.EventTypeName)
                 {
                     case "Hymn":
@@ -389,7 +395,7 @@ namespace SacramentMeetingPlanner.Controllers
                         updateEvent.RowId = person2.PersonId;
                         break;
                 }
-                _context.Events.Add(updateEvent);
+                _context.Events.Attach(updateEvent);
                 _context.SaveChanges();
 
                 lastEventId = updateEvent.EventId;
@@ -399,49 +405,6 @@ namespace SacramentMeetingPlanner.Controllers
                 return RedirectToAction(nameof(Index));
             }
             return View(sacramentMeeting);
-            /*
-            var currentMeeting = await _context.SacramentMeetings
-                .Where(p => p.SacramentMeetingId == sacramentMeeting.SacramentMeetingId)
-                .Include(p => p.EventList)
-                .FirstAsync(i => i.SacramentMeetingId == id);
-
-            if (currentMeeting != null)
-            {
-                _context.Entry(currentMeeting).CurrentValues.SetValues(sacramentMeeting);
-
-                foreach (var existingChild in currentMeeting.EventList.ToList())
-                {
-                    if (!sacramentMeeting.EventList.Any(c => c.EventId == existingChild.EventId))
-                        _context.Events.Remove(existingChild);
-                }
-
-                foreach (var childModel in sacramentMeeting.EventList)
-                {
-                    var existingChild = currentMeeting.EventList
-                        .Where(c => c.EventId == childModel.EventId && c.EventId != default(int))
-                        .SingleOrDefault();
-
-                    if (existingChild != null)
-                        // Update child
-                        _context.Entry(existingChild).CurrentValues.SetValues(childModel);
-                    else
-                    {
-                        // Insert child
-                        var newChild = new Event
-                        {
-                            EventId = (int)childModel.EventId,
-                            EventTypeId  = childModel.EventTypeId,
-                            RowId  = childModel.RowId,
-                            SacramentMeeting = childModel.SacramentMeeting,
-                        };
-
-                        currentMeeting.EventList.Add(newChild);
-                    }
-                }
-                _context.SaveChanges();
-            }
-
-            return View(sacramentMeeting);*/
         }
 
         // GET: SacramentMeetings/Delete/5
@@ -452,14 +415,55 @@ namespace SacramentMeetingPlanner.Controllers
                 return NotFound();
             }
 
-            var sacramentMeeting = await _context.SacramentMeetings
+            SacramentMeeting sacramentMeeting = await _context.SacramentMeetings
+                .AsNoTracking()
+                .Include(c => c.EventList)
+                    .ThenInclude(c => c.EventType)
                 .FirstOrDefaultAsync(m => m.SacramentMeetingId == id);
+
             if (sacramentMeeting == null)
             {
                 return NotFound();
             }
+            List<Event> events = OrderEventList(sacramentMeeting.EventList.ToList());
+            List<EventView> eventViews = new(events.Count);
 
-            return View(sacramentMeeting);
+            SacramentMeetingView detailsView = new()
+            {
+                SacramentMeetingId = sacramentMeeting.SacramentMeetingId,
+                SacramentMeetingDate = sacramentMeeting.SacramentMeetingDate,
+                EventList = eventViews
+            };
+
+            foreach (Event item in events)
+            {
+                EventView view = new()
+                {
+                    EventDescription = item.EventDescription,
+                    EventType = item.EventType.EventTypeName
+                };
+                switch (item.EventType.EventTypeName)
+                {
+                    case "Hymn":
+                        view.Hymn = _context.Hymns.AsNoTracking().Where(h => h.HymnId == item.RowId).First().FullHymn;
+                        break;
+                    case "Speaker":
+                        Person person1 = _context.Person.AsNoTracking().Where(p => p.PersonId == item.RowId).First();
+                        view.FirstName = person1.FirstName;
+                        view.LastName = person1.LastName;
+                        view.Topic = item.Topic;
+                        break;
+                    case "Person":
+                    case "Prayer":
+                        Person person2 = _context.Person.AsNoTracking().Where(p => p.PersonId == item.RowId).First();
+                        view.FirstName = person2.FirstName;
+                        view.LastName = person2.LastName;
+                        break;
+                }
+                eventViews.Add(view);
+            }
+
+            return View(detailsView);
         }
 
         // POST: SacramentMeetings/Delete/5

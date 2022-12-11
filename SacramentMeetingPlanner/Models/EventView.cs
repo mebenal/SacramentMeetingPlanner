@@ -5,7 +5,7 @@ namespace SacramentMeetingPlanner.Models
 {
     public class EventView
     {
-        public int? EventId;
+        public int? EventId { get; set; }
         public int EventTypeId { get; set; }
         [DisplayName("Agenda Item")]
         public string? EventType { get; set; }
