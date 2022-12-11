@@ -176,7 +176,9 @@
                 ]
             }
 
+            let notIn = ["label", "hr"]
             let children = [...this.parentNode.children];
+            children = children.filter(i => !notIn.includes(i.localName));
             let parent = this.parentNode;
             let remove = parent.lastElementChild;
 

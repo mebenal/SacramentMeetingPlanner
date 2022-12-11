@@ -44,41 +44,41 @@
                                     string nameToShow = memberInfo.Length != 0 ? memberInfo.Cast<DisplayNameAttribute>().Single().DisplayName : propertyInfo.Name; 
                                             switch (propertyInfo.Name) {
                                                 case "Hymn":
-                                                            <select name="EventList[@index].HymnId" class="form-control">
-                                                            @{
+                                                                <select name="EventList[@index].HymnId" class="form-control">
+                                                                @{
                                                                 foreach (Hymn hymn in Model.Hymns){
                                                                     string selected = item.HymnId == hymn.HymnId ? "selected" : "";
-                                                                    <option value="@hymn.HymnId" selected>@hymn.FullHymn</option>
+                                                                            <option value="@hymn.HymnId" selected>@hymn.FullHymn</option>
                                                                     }
+                                                                        }
                                                                     }
-                                                                }
-                                                            </select>
+                                                                </select>
                                                     break;
                                                 case "EventType":
-                                                            <select id="event-type" name="EventList[@index].EventTypeId" class="form-control">
-                                                            @{
+                                                                <select id="event-type" name="EventList[@index].EventTypeId" class="form-control">
+                                                                @{
                                                                 foreach (EventType eventType in Model.EventType){
                                                                     bool selected = item.EventTypeId == eventType.EventTypeId;
                                                                     if (selected) {
-                                                                        <option value="@eventType.EventTypeId" selected>@eventType.EventTypeName</option>
+                                                                                <option value="@eventType.EventTypeId" selected>@eventType.EventTypeName</option>
                                                                     }
                                                                     else {
-                                                                        <option value="@eventType.EventTypeId">@eventType.EventTypeName</option>
+                                                                                <option value="@eventType.EventTypeId">@eventType.EventTypeName</option>
                                                                     }
                                                                     }
-                                                                }
-                                                            </select>
+                                                                    }
+                                                                </select>
                                                     break;
                                                 default:
-                                                            <input name="EventList[@index].@propertyInfo.Name" value="@propertyInfo.GetValue(item)" class="form-control">
+                                                                <input name="EventList[@index].@propertyInfo.Name" value="@propertyInfo.GetValue(item)" class="form-control">
                                                     break;
                                             }
                             }
                         }
 
                     }
-                    <input name="EventList[@index].EventId" value="@item.EventId" hidden/>
-                    <a href="#" id="remove">Remove</a>
+                        <input name="EventList[@index].EventId" value="@item.EventId" hidden/>
+                        <a href="#" id="remove">Remove</a>
                 }
             </div>
         }
@@ -170,8 +170,9 @@
                     "Topic"
                 ]
             }
-
+            let notIn = ["label", "hr"]
             let children = [...this.parentNode.children];
+            children = children.filter(i => !notIn.includes(i.localName));
             let parent = this.parentNode;
             let remove = parent.lastElementChild;
 
@@ -191,7 +192,7 @@
                             elementToAdd = document.createElement(`select`);
                             elementToAdd.name = `EventList[${i}].EventTypeId`;
                             elementToAdd.innerHTML = document.getElementById("event-type-string").getAttribute("data-value");
-                            label.innerHTML = "Adgenda Item";
+                            label.innerHTML = "Agenda Item";
                             break;
                         case "EventDescription":
                             elementToAdd = document.createElement("input");
@@ -226,7 +227,7 @@
                 }
             }
             var hr = document.createElement("hr");
-            parent.AppendChild(hr)
+            parent.appendChild(hr)
             parent.appendChild(remove);
 
         })
