@@ -39,3 +39,7 @@ td  {
   float: left;
   overflow: visible;
 }
+
+.date-padding {
+   padding-bottom: 10px
+}

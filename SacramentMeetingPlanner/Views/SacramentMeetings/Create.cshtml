@@ -20,11 +20,12 @@
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create" method="post">
-             <div class="form-group">
+             <div class="form-group date-padding">
                 <label asp-for="SacramentMeetingDate" class="control-label"></label>
                 <input asp-for="SacramentMeetingDate" asp-format="{0:yyyy-MM-dd}" class="form-control" value=@DateTime.Now/>
                 <span asp-validation-for="SacramentMeetingDate" class="text-danger"></span>
             </div>
+            <label>Events</label>
             <div class="form-group" id="event-list">
             @foreach (var (item, index) in Model.EventList?.Select((item, index) => (item, index)))
         {
@@ -51,7 +52,7 @@
                                                             @{
                                                                 foreach (Hymn hymn in Model.Hymns){
                                                                     string selected = item.HymnId == hymn.HymnId ? "selected" : "";
-                                                                    <option value="@hymn.HymnId" selected>@hymn.FullHymn</option>
+                                                             <option value="@hymn.HymnId" class="form-control" selected>@hymn.FullHymn</option>
                                                                     }
                                                                 }
                                                             </select>
@@ -61,7 +62,7 @@
                                                             @{
                                                                 foreach (EventType eventType in Model.EventType){
                                                                     string selected = item.EventTypeId == eventType.EventTypeId ? "selected" : "";
-                                                                    <option value="@eventType.EventTypeId" selected>@eventType.EventTypeName</option>
+                                                                    <option value="@eventType.EventTypeId" class="form-control" selected>@eventType.EventTypeName</option>
                                                                     }
                                                                 }
                                                             </select>
@@ -92,11 +93,11 @@
             var i = $("#event-list").children().length;
             var eventSelect = `
                 <div id=${i} class="form-group event">
-                    <select id="event-type" name="EventList[${i}].EventTypeId"/>
+                    <select id="event-type" class="form-control" name="EventList[${i}].EventTypeId"/>
                         ${document.getElementById("event-type-string").getAttribute("data-value")}
                     </select>
-                    <input name="EventList[${i}].EventDescription"/>
-                    <select name="EventList[${i}].HymnId"/>${document.getElementById("hymn-string").getAttribute("data-value")}</select>
+                    <input name="EventList[${i}].EventDescription" class="form-control" />
+                    <select name="EventList[${i}].HymnId" class="form-control" />${document.getElementById("hymn-string").getAttribute("data-value")}</select>
                     <a href="#" id="remove">Remove</a>
                 </div>`;
             $("#event-list").append(eventSelect);
@@ -204,6 +205,7 @@
                             elementToAdd.innerHTML = document.getElementById("hymn-string").getAttribute("data-value");
                             break;
                     }
+                    elementToAdd.classList.add("form-control");
                     parent.appendChild(elementToAdd);
                 }
             }
