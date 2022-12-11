@@ -1,7 +1,13 @@
-﻿@model SacramentMeetingPlanner.Models.SacramentMeetingView
+﻿@using System.Reflection
+@using System.ComponentModel
+@model SacramentMeetingPlanner.Models.SacramentMeetingView
 
 @{
     ViewData["Title"] = "Create";
+    List<string> doNotDisplay = new()
+    {
+        "EventType"
+    };
 }
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -9,8 +15,8 @@
 
 <h4>SacramentMeeting</h4>
 <hr />
-<div id="hymn-string" style="display:none" data-value="@Model.Hymns"></div>
-<div id="event-type-string" style="display:none" data-value="@Model.EventTypes"></div>
+<div id="hymn-string" style="display:none" data-value="@Model.HymnsString"></div>
+<div id="event-type-string" style="display:none" data-value="@Model.EventTypeString"></div>
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create" method="post">
@@ -19,9 +25,61 @@
                 <input asp-for="SacramentMeetingDate" asp-format="{0:yyyy-MM-dd}" class="form-control" value=@DateTime.Now/>
                 <span asp-validation-for="SacramentMeetingDate" class="text-danger"></span>
             </div>
-            @Html.EditorFor(meeting => meeting.EventList)
             <div class="form-group" id="event-list">
+            @foreach (var (item, index) in Model.EventList?.Select((item, index) => (item, index)))
+        {
+            <div class="row-sm-2 row">
+                <h2>@item.EventType</h2>
+                @{
+                    foreach (PropertyInfo propertyInfo in item.GetType()
+                            .GetProperties(
+                            BindingFlags.Public
+                            | BindingFlags.Instance))
+                    {
+                        if (!doNotDisplay.Contains(propertyInfo.Name))
+                        {
+                            if (propertyInfo.GetValue(item) is not null)
+                            {
+                                    object[] memberInfo = propertyInfo.GetCustomAttributes(typeof(DisplayNameAttribute), true);
+                                    string nameToShow = memberInfo.Length != 0 ? memberInfo.Cast<DisplayNameAttribute>().Single().DisplayName : propertyInfo.Name;
+                                            <div class="col-3">
+                                                <label>@nameToShow</label>
+                                                @{
+                                            switch (propertyInfo.Name) {
+                                                case "Hymn":
+                                                            <select>
+                                                            @{
+                                                                foreach (Hymn hymn in Model.Hymns){
+                                                                    string selected = item.HymnId == hymn.HymnId ? "selected" : "";
+                                                                    <option value="@hymn.HymnId" selected>@hymn.FullHymn</option>
+                                                                    }
+                                                                }
+                                                            </select>
+                                                    break;
+                                                case "EventType":
+                                                            <select>
+                                                            @{
+                                                                foreach (EventType eventType in Model.EventType){
+                                                                    string selected = item.EventTypeId == eventType.EventTypeId ? "selected" : "";
+                                                                    <option value="@eventType.EventTypeId" selected>@eventType.EventTypeName</option>
+                                                                    }
+                                                                }
+                                                            </select>
+                                                    break;
+                                                default:
+                                                            <input name="EventList[@index].@propertyInfo.Name">
+                                                    break;
+                                            }
+                                                }
+                                            </div>
+                            }
+                        }
+
+                    }
+                }
             </div>
+        }
+        </div>
             <a href="#" id="add">Add</a><br>
             <input type="submit" value="Create" class="btn btn-default" />
         </form>
@@ -34,11 +92,11 @@
             var i = $("#event-list").children().length;
             var eventSelect = `
                 <div id=${i} class="form-group event">
-                    <select id="event-type" name="EventList[${i}].EventType"/>
+                    <select id="event-type" name="EventList[${i}].EventTypeId"/>
                         ${document.getElementById("event-type-string").getAttribute("data-value")}
                     </select>
                     <input name="EventList[${i}].EventDescription"/>
-                    <select name="EventList[${i}].Hymn"/>${document.getElementById("hymn-string").getAttribute("data-value")}</select>
+                    <select name="EventList[${i}].HymnId"/>${document.getElementById("hymn-string").getAttribute("data-value")}</select>
                     <a href="#" id="remove">Remove</a>
                 </div>`;
             $("#event-list").append(eventSelect);
@@ -53,8 +111,8 @@
                     this.id = this.id - 1
                     for (var child = 0; child < this.children.length; child++){
                         var startStr = `EventList[${this.id}].`;
-                        if (this.children[child].name.includes("EventType")){
-                            this.children[child].name =`${startStr}EventType`;
+                        if (this.children[child].name.includes("EventTypeId")){
+                            this.children[child].name =`${startStr}EventTypeId`;
                         } else if (this.children[child].name.includes("EventDescription")){
                             this.children[child].name =`${startStr}EventDescription`;
                         } else if (this.children[child].name.includes("FirstName")){
@@ -63,8 +121,8 @@
                             this.children[child].name =`${startStr}LastName`;
                         } else if (this.children[child].name.includes("Topic")){
                             this.children[child].name =`${startStr}Topic`;
-                        } else if (this.children[child].name.includes("Hymn")){
-                            this.children[child].name =`${startStr}Hymn`;
+                        } else if (this.children[child].name.includes("HymnId")){
+                            this.children[child].name =`${startStr}HymnId`;
                         }
                     }
                 }
@@ -79,24 +137,24 @@
             element.innerHTML = document.getElementById("hymn-string").getAttribute("data-value");
             let correctFields = {
                 "1" : [
-                    "EventType",
+                    "EventTypeId",
                     "EventDescription",
-                    "Hymn"
+                    "HymnId"
                 ], 
                 "2" : [
-                    "EventType",
+                    "EventTypeId",
                     "EventDescription",
                     "FirstName",
                     "LastName"
                 ],
                 "3" : [
-                    "EventType",
+                    "EventTypeId",
                     "EventDescription",
                     "FirstName",
                     "LastName"
                 ],
                 "4" : [
-                    "EventType",
+                    "EventTypeId",
                     "EventDescription",
                     "FirstName",
                     "LastName",
@@ -119,9 +177,9 @@
                 } else {
                     var elementToAdd;
                     switch (element) {
-                        case "EventType":
+                        case "EventTypeId":
                             elementToAdd = document.createElement(`select`);
-                            elementToAdd.name = `EventList[${i}].EventType`;
+                            elementToAdd.name = `EventList[${i}].EventTypeId`;
                             elementToAdd.innerHTML = document.getElementById("event-type-string").getAttribute("data-value");
                             break;
                         case "EventDescription":
@@ -140,9 +198,9 @@
                             elementToAdd = document.createElement("input");
                             elementToAdd.name = `EventList[${i}].Topic`
                             break;
-                        case "Hymn":
+                        case "HymnId":
                             elementToAdd = document.createElement(`select`);
-                            elementToAdd.name = `EventList[${i}].Hymn`;
+                            elementToAdd.name = `EventList[${i}].HymnId`;
                             elementToAdd.innerHTML = document.getElementById("hymn-string").getAttribute("data-value");
                             break;
                     }
