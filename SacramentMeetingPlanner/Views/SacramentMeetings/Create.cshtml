@@ -44,41 +44,41 @@
                                     string nameToShow = memberInfo.Length != 0 ? memberInfo.Cast<DisplayNameAttribute>().Single().DisplayName : propertyInfo.Name; 
                                             switch (propertyInfo.Name) {
                                                 case "Hymn":
-                                                                <select name="EventList[@index].HymnId" class="form-control">
-                                                                @{
+                                                                    <select name="EventList[@index].HymnId" class="form-control">
+                                                                    @{
                                                                 foreach (Hymn hymn in Model.Hymns){
                                                                     string selected = item.HymnId == hymn.HymnId ? "selected" : "";
-                                                                            <option value="@hymn.HymnId" selected>@hymn.FullHymn</option>
+                                                                                    <option value="@hymn.HymnId" selected>@hymn.FullHymn</option>
                                                                     }
+                                                                            }
                                                                         }
-                                                                    }
-                                                                </select>
+                                                                    </select>
                                                     break;
                                                 case "EventType":
-                                                                <select id="event-type" name="EventList[@index].EventTypeId" class="form-control">
-                                                                @{
+                                                                    <select id="event-type" name="EventList[@index].EventTypeId" class="form-control">
+                                                                    @{
                                                                 foreach (EventType eventType in Model.EventType){
                                                                     bool selected = item.EventTypeId == eventType.EventTypeId;
                                                                     if (selected) {
-                                                                                <option value="@eventType.EventTypeId" selected>@eventType.EventTypeName</option>
+                                                                                        <option value="@eventType.EventTypeId" selected>@eventType.EventTypeName</option>
                                                                     }
                                                                     else {
-                                                                                <option value="@eventType.EventTypeId">@eventType.EventTypeName</option>
+                                                                                        <option value="@eventType.EventTypeId">@eventType.EventTypeName</option>
                                                                     }
                                                                     }
-                                                                    }
-                                                                </select>
+                                                                        }
+                                                                    </select>
                                                     break;
                                                 default:
-                                                                <input name="EventList[@index].@propertyInfo.Name" value="@propertyInfo.GetValue(item)" class="form-control">
+                                                                    <input name="EventList[@index].@propertyInfo.Name" value="@propertyInfo.GetValue(item)" class="form-control">
                                                     break;
                                             }
                             }
                         }
 
                     }
-                        <input name="EventList[@index].EventId" value="@item.EventId" hidden/>
-                        <a href="#" id="remove">Remove</a>
+                            <input name="EventList[@index].EventId" value="@item.EventId" hidden/>
+                            <a href="#" id="remove">Remove</a>
                 }
             </div>
         }
@@ -104,7 +104,6 @@
                     <label>Hymn</label>
                     <select name="EventList[${i}].HymnId" class="form-control"/>${document.getElementById("hymn-string").getAttribute("data-value")}</select>
                     <a href="#" id="remove">Remove</a>
-                    <hr>
                 </div>`;
             $("#event-list").append(eventSelect);
         });
@@ -179,14 +178,35 @@
             while (parent.firstChild) {
                 parent.removeChild(parent.firstChild)
             }
-
             for (var element of correctFields[`${this.value}`]) {
                 item = children.find(item => item.name.includes(element))
                 if (typeof item !== "undefined" ) {
+                    var label = document.createElement("label");
+                    switch (element) {
+                        case "EventTypeId":
+                            label.innerHTML = "Agenda Item";
+                            break;
+                        case "EventDescription":
+                            label.innerHTML = "Adgenda Item Description";
+                            break;
+                        case "FirstName":
+                            label.innerHTML = "First Name";
+                            break;
+                        case "LastName":
+                            label.innerHTML = "Last Name";
+                            break;
+                        case "Topic":
+                            label.innerHTML = "Topic";
+                            break;
+                        case "HymnId":
+                            label.innerHTML = "Hymn";
+                            break;
+                    }
+                    parent.appendChild(label);
                     parent.appendChild(item);
                 } else {
-                    var elementToAdd;
                     var label = document.createElement("label");
+                    var elementToAdd;
                     switch (element) {
                         case "EventTypeId":
                             elementToAdd = document.createElement(`select`);

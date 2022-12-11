@@ -7,7 +7,8 @@
     List<string> doNotDisplay = new()
     {
         "EventTypeId",
-        "HymnId"
+        "HymnId",
+        "EventId"
     };
 }
 
@@ -109,7 +110,6 @@
                     <label>Hymn</label>
                     <select name="EventList[${i}].HymnId" class="form-control"/>${document.getElementById("hymn-string").getAttribute("data-value")}</select>
                     <a href="#" id="remove">Remove</a>
-                    <hr>
                 </div>`;
             $("#event-list").append(eventSelect);
         });
@@ -175,7 +175,6 @@
                     "Topic"
                 ]
             }
-
             let notIn = ["label", "hr"]
             let children = [...this.parentNode.children];
             children = children.filter(i => !notIn.includes(i.localName));
@@ -185,20 +184,41 @@
             while (parent.firstChild) {
                 parent.removeChild(parent.firstChild)
             }
-
             for (var element of correctFields[`${this.value}`]) {
                 item = children.find(item => item.name.includes(element))
                 if (typeof item !== "undefined" ) {
+                    var label = document.createElement("label");
+                    switch (element) {
+                        case "EventTypeId":
+                            label.innerHTML = "Agenda Item";
+                            break;
+                        case "EventDescription":
+                            label.innerHTML = "Adgenda Item Description";
+                            break;
+                        case "FirstName":
+                            label.innerHTML = "First Name";
+                            break;
+                        case "LastName":
+                            label.innerHTML = "Last Name";
+                            break;
+                        case "Topic":
+                            label.innerHTML = "Topic";
+                            break;
+                        case "HymnId":
+                            label.innerHTML = "Hymn";
+                            break;
+                    }
+                    parent.appendChild(label);
                     parent.appendChild(item);
                 } else {
-                    var elementToAdd;
                     var label = document.createElement("label");
+                    var elementToAdd;
                     switch (element) {
                         case "EventTypeId":
                             elementToAdd = document.createElement(`select`);
                             elementToAdd.name = `EventList[${i}].EventTypeId`;
                             elementToAdd.innerHTML = document.getElementById("event-type-string").getAttribute("data-value");
-                            label.innerHTML = "Adgenda Item";
+                            label.innerHTML = "Agenda Item";
                             break;
                         case "EventDescription":
                             elementToAdd = document.createElement("input");
@@ -233,7 +253,7 @@
                 }
             }
             var hr = document.createElement("hr");
-            parent.AppendChild(hr)
+            parent.appendChild(hr)
             parent.appendChild(remove);
 
         })
