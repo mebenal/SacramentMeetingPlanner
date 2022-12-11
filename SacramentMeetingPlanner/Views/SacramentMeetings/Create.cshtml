@@ -20,7 +20,7 @@
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create" method="post">
-             <div class="form-group">
+             <div class="form-group date-padding">
                 <label asp-for="SacramentMeetingDate" class="control-label"></label>
                 <input asp-for="SacramentMeetingDate" asp-format="{0:yyyy-MM-dd}" class="form-control" value=@DateTime.Now/>
                 <span asp-validation-for="SacramentMeetingDate" class="text-danger"></span>
@@ -43,7 +43,7 @@
                                     string nameToShow = memberInfo.Length != 0 ? memberInfo.Cast<DisplayNameAttribute>().Single().DisplayName : propertyInfo.Name; 
                                             switch (propertyInfo.Name) {
                                                 case "Hymn":
-                                                            <select name="EventList[@index].HymnId">
+                                                            <select name="EventList[@index].HymnId" class="form-control">
                                                             @{
                                                                 foreach (Hymn hymn in Model.Hymns){
                                                                     bool selected = item.HymnId == hymn.HymnId;
@@ -57,7 +57,7 @@
                                                             </select>
                                                     break;
                                                 case "EventType":
-                                                            <select id="event-type" name="EventList[@index].EventTypeId">
+                                                            <select id="event-type" name="EventList[@index].EventTypeId" class="form-control">
                                                             @{
                                                                 foreach (EventType eventType in Model.EventType){
                                                                     bool selected = item.EventTypeId == eventType.EventTypeId;
@@ -72,7 +72,7 @@
                                                             </select>
                                                     break;
                                                 default:
-                                                            <input name="EventList[@index].@propertyInfo.Name" value="@propertyInfo.GetValue(item)">
+                                                            <input name="EventList[@index].@propertyInfo.Name" value="@propertyInfo.GetValue(item)" class="form-control">
                                                     break;
                                             }
                             }
@@ -97,12 +97,16 @@
             var i = $("#event-list").children().length;
             var eventSelect = `
                 <div id=${i} class="form-group event">
-                    <select id="event-type" name="EventList[${i}].EventTypeId"/>
+                    <label>Agenda Item</label>
+                    <select id="event-type" name="EventList[${i}].EventTypeId" class="form-control"/>
                         ${document.getElementById("event-type-string").getAttribute("data-value")}
                     </select>
-                    <input name="EventList[${i}].EventDescription"/>
-                    <select name="EventList[${i}].HymnId"/>${document.getElementById("hymn-string").getAttribute("data-value")}</select>
+                    <label>Agenda Item Description</label>
+                    <input name="EventList[${i}].EventDescription" class="form-control"/>
+                    <label>Hymn</label>
+                    <select name="EventList[${i}].HymnId" class="form-control"/>${document.getElementById("hymn-string").getAttribute("data-value")}</select>
                     <a href="#" id="remove">Remove</a>
+                    <hr>
                 </div>`;
             $("#event-list").append(eventSelect);
         });
@@ -128,6 +132,8 @@
                             this.children[child].name =`${startStr}Topic`;
                         } else if (this.children[child].name.includes("HymnId")){
                             this.children[child].name =`${startStr}HymnId`;
+                        } else if (this.children[child].name.includes("EventId")) {
+                            this.children[child].name =`${startStr}EventId`;
                         }
                     }
                 }
@@ -181,37 +187,48 @@
                     parent.appendChild(item);
                 } else {
                     var elementToAdd;
+                    var label = document.createElement("label");
                     switch (element) {
                         case "EventTypeId":
                             elementToAdd = document.createElement(`select`);
                             elementToAdd.name = `EventList[${i}].EventTypeId`;
                             elementToAdd.innerHTML = document.getElementById("event-type-string").getAttribute("data-value");
+                            label.innerHTML = "Adgenda Item";
                             break;
                         case "EventDescription":
                             elementToAdd = document.createElement("input");
                             elementToAdd.name = `EventList[${i}].EventDescription`
+                            label.innerHTML = "Adgenda Item Description";
                             break;
                         case "FirstName":
                             elementToAdd = document.createElement("input");
                             elementToAdd.name = `EventList[${i}].FirstName`
+                            label.innerHTML = "First Name";
                             break;
                         case "LastName":
                             elementToAdd = document.createElement("input");
                             elementToAdd.name = `EventList[${i}].LastName`
+                            label.innerHTML = "Last Name";
                             break;
                         case "Topic":
                             elementToAdd = document.createElement("input");
                             elementToAdd.name = `EventList[${i}].Topic`
+                            label.innerHTML = "Topic";
                             break;
                         case "HymnId":
                             elementToAdd = document.createElement(`select`);
                             elementToAdd.name = `EventList[${i}].HymnId`;
                             elementToAdd.innerHTML = document.getElementById("hymn-string").getAttribute("data-value");
+                            label.innerHTML = "Hymn";
                             break;
                     }
+                    elementToAdd.classList.add("form-control");
+                    parent.appendChild(label);
                     parent.appendChild(elementToAdd);
                 }
             }
+            var hr = document.createElement("hr");
+            parent.AppendChild(hr)
             parent.appendChild(remove);
 
         })
